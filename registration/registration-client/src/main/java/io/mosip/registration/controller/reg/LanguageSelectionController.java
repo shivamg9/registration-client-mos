@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 import io.mosip.registration.dto.mastersync.GenericDto;
 import io.mosip.registration.exception.PreConditionCheckException;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -45,6 +47,9 @@ public class LanguageSelectionController extends BaseController implements Initi
 	 * Instance of {@link Logger}
 	 */
 	private static final Logger LOGGER = AppConfig.getLogger(LanguageSelectionController.class);
+
+	@FXML
+	private VBox languageContainer;
 
 	@FXML
 	private Button submit;
@@ -95,6 +100,14 @@ public class LanguageSelectionController extends BaseController implements Initi
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		ResourceBundle resourceBundle = applicationContext.getApplicationLanguageLabelBundle();
+//
+//		String languageValue = RegistrationUIConstants.getMessageLanguageSpecific("language");
+//		String[] parts = languageValue.split(" ");
+//
+//		Label label1 = new Label(parts[0]);
+//		label1.getStyleClass().add("language-label");
+//
+//		languageContainer.getChildren().add(label1);
 		try {
 			List<GenericDto> langCodes = getConfiguredLanguages();
 			List<String> mandatoryLangCodes = baseService.getMandatoryLanguages();

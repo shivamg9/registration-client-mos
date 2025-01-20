@@ -3,11 +3,19 @@ package io.mosip.registration.controller;
 import static io.mosip.registration.constants.RegistrationConstants.APPLICATION_ID;
 import static io.mosip.registration.constants.RegistrationConstants.APPLICATION_NAME;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.Map;
+import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
+import javafx.scene.text.Font;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
@@ -276,4 +284,44 @@ public class ClientApplication extends Application {
 	public static boolean isSyncCompleted() {
 		return syncCompleted;
 	}
+//	private void loadFonts() {
+//		try {
+//			Font.loadFont(getClass().getResourceAsStream("/fonts/NotoSansMyanmar-Regular.ttf"), 14);
+//			LOGGER.info("Fonts loaded successfully.");
+//		} catch (Exception exception) {
+//			LOGGER.error("Failed to load fonts", exception);
+//		}
+//	}
+//
+//	private void setupResourceBundle() {
+//		Locale locale = new Locale("my");
+//		try {
+//			ResourceBundle.Control control = new ResourceBundle.Control() {
+//				@Override
+//				public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader,
+//												boolean reload) throws IllegalAccessException, InstantiationException, IOException, IOException {
+//					String bundleName = toBundleName(baseName, locale);
+//					String resourceName = toResourceName(bundleName, "properties");
+//					InputStream stream = null;
+//					if (reload) {
+//						URL url = loader.getResource(resourceName);
+//						if (url != null) {
+//							stream = url.openStream();
+//						}
+//					} else {
+//						stream = loader.getResourceAsStream(resourceName);
+//					}
+//					if (stream != null) {
+//						try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+//							return new PropertyResourceBundle(reader);
+//						}
+//					}
+//					return null;
+//				}
+//			};
+//			ResourceBundle.getBundle(RegistrationConstants.LABELS, locale, control);
+//		} catch (Exception e) {
+//			LOGGER.error("Failed to load resource bundle", e);
+//		}
+//	}
 }
