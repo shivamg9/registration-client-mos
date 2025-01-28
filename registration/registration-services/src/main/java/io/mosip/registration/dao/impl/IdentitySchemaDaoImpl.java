@@ -172,6 +172,7 @@ public class IdentitySchemaDaoImpl implements IdentitySchemaDao {
 
 	private boolean isValidFile(String content, String checksum) {
 		return checksum.equals(CryptoUtil.computeFingerPrint(content, null).toLowerCase());
+//		return true;
 	}
 
 	@Override
