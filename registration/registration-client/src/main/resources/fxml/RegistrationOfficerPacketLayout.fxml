@@ -444,9 +444,9 @@
                             <RowConstraints maxHeight="81.0" minHeight="10.0" prefHeight="81.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <Label styleClass="newsUpdatesTitle" text="Update Title" />
-                              <Label styleClass="newsUpdateTime" text="Monday 10 Jan 8:00 AM" GridPane.rowIndex="1" />
-                              <Label styleClass="newsUpdateTime" text="Description" GridPane.rowIndex="2" />
+                              <Label styleClass="newsUpdatesTitle" text="%update.title" />
+                              <Label styleClass="newsUpdateTime" text="%update.time" GridPane.rowIndex="1" />
+                              <Label styleClass="newsUpdateTime" text="%update.description" GridPane.rowIndex="2" />
                            </children>
                            <GridPane.margin>
                               <Insets left="15.0" />
@@ -454,9 +454,9 @@
                         </GridPane>
                         <GridPane GridPane.rowIndex="1">
                            <children>
-                              <Label styleClass="newsUpdatesTitle" text="Update Title" />
-                              <Label styleClass="newsUpdateTime" text="Monday 10 Jan 8:00 AM" GridPane.rowIndex="1" />
-                              <Label styleClass="newsUpdateTime" text="Description" GridPane.rowIndex="2" />
+                              <Label styleClass="newsUpdatesTitle" text="%update.title" />
+                              <Label styleClass="newsUpdateTime" text="%update.time" GridPane.rowIndex="1" />
+                              <Label styleClass="newsUpdateTime" text="%update.description" GridPane.rowIndex="2" />
                            </children>
                            <columnConstraints>
                               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -472,9 +472,9 @@
                         </GridPane>
                         <GridPane GridPane.rowIndex="2">
                            <children>
-                              <Label styleClass="newsUpdatesTitle" text="Update Title" />
-                              <Label styleClass="newsUpdateTime" text="Monday 10 Jan 8:00 AM" GridPane.rowIndex="1" />
-                              <Label styleClass="newsUpdateTime" text="Description" GridPane.rowIndex="2" />
+                              <Label styleClass="newsUpdatesTitle" text="%update.title" />
+                              <Label styleClass="newsUpdateTime" text="%update.time" GridPane.rowIndex="1" />
+                              <Label styleClass="newsUpdateTime" text="%update.description" GridPane.rowIndex="2" />
                            </children>
                            <columnConstraints>
                               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -490,9 +490,9 @@
                         </GridPane>
                         <GridPane GridPane.rowIndex="3">
                            <children>
-                              <Label styleClass="newsUpdatesTitle" text="Update Title" />
-                              <Label styleClass="newsUpdateTime" text="Monday 10 Jan 8:00 AM" GridPane.rowIndex="1" />
-                              <Label styleClass="newsUpdateTime" text="Description" GridPane.rowIndex="2" />
+                              <Label styleClass="newsUpdatesTitle" text="%update.title" />
+                              <Label styleClass="newsUpdateTime" text="%update.time" GridPane.rowIndex="1" />
+                              <Label styleClass="newsUpdateTime" text="%update.description" GridPane.rowIndex="2" />
                            </children>
                            <columnConstraints>
                               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
