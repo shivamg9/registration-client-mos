@@ -88,6 +88,6 @@ RUN chmod a+x configure.sh \
     && chown -R ${container_user}:${container_user} /var/www
 
 # --- Switch to container user ---
-USER ${container_user_uid}:${container_user_gid}
+#USER ${container_user_uid}:${container_user_gid}
 
 ENTRYPOINT ["./configure.sh"]
