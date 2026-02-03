@@ -15,13 +15,7 @@ on:
   push:
     branches:
       - '!release-branch'
-      - release*
-      - master
-      - 1.*
-      - develop
-      - MOSIP*
-      - mos
-
+      - test-mm
 jobs:
   build-regclient:
     uses: mosip/kattu/.github/workflows/maven-build.yml@master
