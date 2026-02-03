@@ -1,8 +1,7 @@
 # ------------------------------------------------------------
-# Base image UPDATED to Java 17 (JavaFX 17 compatible)
+# Base image: Java 11
 # ------------------------------------------------------------
-FROM eclipse-temurin:17-jdk-jammy
-
+FROM eclipse-temurin:11-jdk-jammy
 
 # ------------------------------------------------------------
 # Build metadata (UNCHANGED)
@@ -36,7 +35,7 @@ ENV keystore_secret_env=${keystore_secret}
 ENV signer_timestamp_url_env=${signer_timestamp_url}
 
 # ------------------------------------------------------------
-# Locale (UNCHANGED)
+# Locale
 # ------------------------------------------------------------
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
@@ -50,7 +49,7 @@ ARG container_user_uid=1001
 ARG container_user_gid=1001
 
 # ------------------------------------------------------------
-# System deps (UPDATED – JavaFX 17 + shaping libs)
+# System deps: JavaFX 17 + shaping
 # ------------------------------------------------------------
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openjfx \
@@ -70,7 +69,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # ------------------------------------------------------------
-# JavaFX runtime flags (UPDATED – t2k REMOVED)
+# JavaFX runtime flags (NO t2k)
 # ------------------------------------------------------------
 ENV JAVA_TOOL_OPTIONS="\
 -Dfile.encoding=UTF-8 \
@@ -79,14 +78,14 @@ ENV JAVA_TOOL_OPTIONS="\
 -Djavafx.font.fallback=true"
 
 # ------------------------------------------------------------
-# Fonts (UNCHANGED behavior, safer fontdir)
+# Myanmar fonts
 # ------------------------------------------------------------
 RUN mkdir -p /usr/share/fonts/truetype/myanmar
 COPY registration-client/src/main/resources/fonts/*.ttf /usr/share/fonts/truetype/myanmar/
 RUN fc-cache -f -v
 
 # ------------------------------------------------------------
-# App files (UNCHANGED)
+# App files
 # ------------------------------------------------------------
 WORKDIR /home/${container_user}
 ENV work_dir=/home/${container_user}
