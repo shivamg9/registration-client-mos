@@ -84,7 +84,7 @@ ENV JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8 \
 -Dprism.fontdir=/usr/share/fonts/truetype/myanmar"
 
 RUN mkdir -p /usr/share/fonts/truetype/myanmar
-COPY registration/registration-client/src/main/resources/fonts/Padauk.ttf \
+COPY registration-client/src/main/resources/fonts/Padauk.ttf \
      /usr/share/fonts/truetype/myanmar/Padauk.ttf
 COPY 99-myanmar.conf /etc/fonts/conf.d/99-myanmar.conf
 RUN fc-cache -f -v
