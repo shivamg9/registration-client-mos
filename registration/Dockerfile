@@ -27,7 +27,7 @@ ENV signer_timestamp_url_env=${signer_timestamp_url}
 
 # --- Burmese Language & Encoding Support ---
 # Force JVM to use UTF-8 for Burmese character processing
-ENV JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
+#ENV JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
 # Ensure the OS locale supports UTF-8
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
@@ -77,6 +77,12 @@ RUN sed -i 's|http://deb.debian.org|http://archive.debian.org|g' /etc/apt/source
 # ------------------------------------------------------------
 # Install Padauk from project resources
 # ------------------------------------------------------------
+ENV JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8 \
+-Dsun.jnu.encoding=UTF-8 \
+-Djavafx.font.fallback=false \
+-Dprism.order=sw \
+-Dprism.fontdir=/usr/share/fonts/truetype/myanmar"
+
 RUN mkdir -p /usr/share/fonts/truetype/myanmar
 COPY registration/registration-client/src/main/resources/fonts/Padauk.ttf \
      /usr/share/fonts/truetype/myanmar/Padauk.ttf
