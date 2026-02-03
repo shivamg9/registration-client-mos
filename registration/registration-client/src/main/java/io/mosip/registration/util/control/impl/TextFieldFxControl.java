@@ -177,7 +177,11 @@ public class TextFieldFxControl extends FxControl {
 		switch (this.uiFieldDTO.getType()) {
 			case RegistrationConstants.SIMPLE_TYPE :
 				getRegistrationDTo().getSelectedLanguagesByApplicant().forEach(langCode -> {
-					labels.add(this.uiFieldDTO.getLabel().get(langCode));
+					String labelText = this.uiFieldDTO.getLabel().get(langCode);
+					if (labelText != null && "bur".equals(langCode)) {
+						labelText = labelText.replaceAll("(\\S+)", "$1\u200C");
+					}
+					labels.add(labelText);
 					vBox.getChildren().add(createTextBox(langCode,true));
 					vBox.getChildren().add(getLabel(uiFieldDTO.getId() + langCode + RegistrationConstants.MESSAGE, null,
 							RegistrationConstants.DemoGraphicFieldMessageLabel, false, simpleTypeVBox.getPrefWidth()));
@@ -207,7 +211,11 @@ public class TextFieldFxControl extends FxControl {
 			default:
 				String langCode = getRegistrationDTo().getSelectedLanguagesByApplicant().get(0);
 				getRegistrationDTo().getSelectedLanguagesByApplicant().forEach(langcode -> {
-							labels.add(this.uiFieldDTO.getLabel().get(langcode));});
+					String labelText = this.uiFieldDTO.getLabel().get(langcode);
+					if (labelText != null && "bur".equals(langcode)) {
+						labelText = labelText.replaceAll("(\\S+)", "$1\u200C");
+					}
+					labels.add(labelText);});
 				vBox.getChildren().add(createTextBox(langCode,false));
 				vBox.getChildren().add(getLabel(uiFieldDTO.getId() + langCode + RegistrationConstants.MESSAGE,
 						null, RegistrationConstants.DemoGraphicFieldMessageLabel, false, simpleTypeVBox.getPrefWidth()));

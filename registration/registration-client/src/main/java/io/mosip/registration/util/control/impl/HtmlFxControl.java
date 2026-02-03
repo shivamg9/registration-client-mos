@@ -70,7 +70,13 @@ public class HtmlFxControl extends FxControl {
 
         List<String> labels = new ArrayList<>();
         getRegistrationDTo().getSelectedLanguagesByApplicant().forEach(langCode -> {
-            labels.add(this.uiFieldDTO.getLabel().get(langCode));
+            String labelText = this.uiFieldDTO.getLabel().get(langCode);
+            // Check if text exists and if the language is 'bur'
+            if (labelText != null && "bur".equals(langCode)) {
+                // Append \u200C to the end of every word
+                labelText = labelText.replaceAll("(\\S+)", "$1\u200C");
+            }
+            labels.add(labelText);
         });
         labels.removeAll(Collections.singletonList(null));
 
@@ -86,6 +92,9 @@ public class HtmlFxControl extends FxControl {
             //     return;
             // }
             String titleText = resourceBundle.getString(langCode);
+            if ("bur".equals(langCode) && titleText != null) {
+                titleText = titleText.replaceAll("(\\S+)", "$1\u200C");
+            }
             Label headerLabel = new Label(titleText);
             if ("bur".equals(langCode)) {
                 headerLabel.setStyle("-fx-font-family: 'Myanmar Text'; -fx-font-size: 12px;");

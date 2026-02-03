@@ -129,7 +129,12 @@ public class BiometricFxControl extends FxControl {
 
 		List<String> labels = new ArrayList<>();
 		getRegistrationDTo().getSelectedLanguagesByApplicant().forEach(langCode -> {
-					labels.add(this.uiFieldDTO.getLabel().get(langCode));
+				String labelText = this.uiFieldDTO.getLabel().get(langCode);
+				// Apply Burmese separator
+				if (labelText != null && "bur".equals(langCode)) {
+					labelText = labelText.replaceAll("(\\S+)", "$1\u200C");
+				}
+				labels.add(labelText);
 				});
 
 		Label label = new Label();
@@ -268,8 +273,15 @@ public class BiometricFxControl extends FxControl {
 		}
 		
 		button.getStyleClass().add(RegistrationConstants.MODALITY_BUTTONS);
-		Tooltip tooltip = new Tooltip(ApplicationContext.getInstance().getBundle(ApplicationContext.applicationLanguage(),
-				RegistrationConstants.LABELS).getString(modality.name()));
+		String langCode = ApplicationContext.applicationLanguage();
+		String tooltipText = ApplicationContext.getInstance()
+				.getBundle(langCode, RegistrationConstants.LABELS)
+				.getString(modality.name());
+		// Apply Burmese separator
+		if ("bur".equals(langCode) && tooltipText != null) {
+			tooltipText = tooltipText.replaceAll("(\\S+)", "$1\u200C");
+		}
+		Tooltip tooltip = new Tooltip(tooltipText);
 		tooltip.getStyleClass().add(RegistrationConstants.TOOLTIP_STYLE);
 		button.setTooltip(tooltip);
 		button.setOnAction(getModalityActionHandler(this, modality));

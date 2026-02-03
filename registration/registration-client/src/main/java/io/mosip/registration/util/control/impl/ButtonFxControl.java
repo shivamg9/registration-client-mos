@@ -80,7 +80,12 @@ public class ButtonFxControl extends FxControl {
 				true, prefWidth);
 		List<String> labels = new ArrayList<>();
 		getRegistrationDTo().getSelectedLanguagesByApplicant().forEach(lCode -> {
-			labels.add(this.uiFieldDTO.getLabel().get(lCode));
+			String labelText = this.uiFieldDTO.getLabel().get(lCode);
+			// Apply suffix only if language is 'bur' (Burmese)
+			if (labelText != null && "bur".equals(lCode)) {
+				labelText = labelText.replaceAll("(\\S+)", "$1\u200C");
+			}
+			labels.add(labelText);
 		});
 
 		fieldTitle.setText(String.join(RegistrationConstants.SLASH, labels)	+ getMandatorySuffix(uiFieldDTO));
@@ -148,15 +153,21 @@ public class ButtonFxControl extends FxControl {
 	public void fillData(Object data) {
 		if (data != null) {
 			Map<String, List<GenericDto>> val = (Map<String, List<GenericDto>>) data;
+			String langCode = getRegistrationDTo().getSelectedLanguagesByApplicant().get(0);
 			setItems((HBox) getField(uiFieldDTO.getId() + RegistrationConstants.HBOX),
-					val.get(getRegistrationDTo().getSelectedLanguagesByApplicant().get(0)));
+					val.get(langCode),langCode);
 		}
 	}
 
-	private void setItems(HBox hBox, List<GenericDto> val) {
+	private void setItems(HBox hBox, List<GenericDto> val,String langCode) {
 		if (hBox != null && val != null && !val.isEmpty()) {
 			val.forEach(genericDto -> {
-				Button button = new Button(genericDto.getName());
+				String buttonText = genericDto.getName();
+				// --- LOGIC FOR BUTTON TEXT (e.g. Male/Female) ---
+				if ("bur".equals(langCode) && buttonText != null && !("English".equals(buttonText))) {
+					buttonText = buttonText.replaceAll("(\\S+)", "$1\u200C");
+				}
+				Button button = new Button(buttonText);
 				button.setId(uiFieldDTO.getId() + genericDto.getCode());
 				hBox.setSpacing(10);
 				hBox.setPadding(new Insets(10, 10, 10, 10));

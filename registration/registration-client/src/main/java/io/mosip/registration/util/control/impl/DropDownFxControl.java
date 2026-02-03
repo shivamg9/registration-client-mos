@@ -125,7 +125,12 @@ public class DropDownFxControl extends FxControl {
 
 		List<String> labels = new ArrayList<>();
 		getRegistrationDTo().getSelectedLanguagesByApplicant().forEach(lCode -> {
-			labels.add(this.uiFieldDTO.getLabel().get(lCode));
+			String labelText = this.uiFieldDTO.getLabel().get(lCode);
+			// Apply suffix only if language is Burmese
+			if (labelText != null && "bur".equals(lCode)) {
+				labelText = labelText.replaceAll("(\\S+)", "$1\u200C");
+			}
+			labels.add(labelText);
 		});
 
 		String titleText = String.join(RegistrationConstants.SLASH, labels) + getMandatorySuffix(uiFieldDTO);
@@ -328,8 +333,12 @@ public class DropDownFxControl extends FxControl {
 					Optional<GenericDto> result = getPossibleValues(langCode).stream()
 							.filter(b -> b.getCode().equals(selectedCode)).findFirst();
 					if (result.isPresent()) {
-						
-						toolTipText.add(result.get().getName());
+						String name = result.get().getName();
+						// Apply Burmese word separator
+						if ("bur".equals(langCode) && name != null && !("English".equals(name))) {
+							name = name.replaceAll("(\\S+)", "$1\u200C");
+						}
+						toolTipText.add(name);
 					}
 				}
 
@@ -397,13 +406,22 @@ public class DropDownFxControl extends FxControl {
 
 	private void setItems(ComboBox<GenericDto> comboBox, List<GenericDto> val) {
 		if (comboBox != null && val != null && !val.isEmpty()) {
+			String langCode = getRegistrationDTo().getSelectedLanguagesByApplicant().get(0);
 			comboBox.getItems().clear();
-			comboBox.getItems().addAll(val);
-
-			new ComboBoxAutoComplete<GenericDto>(comboBox);
-			
+			val.forEach(dto -> {
+				String name = dto.getName();
+				// Apply Burmese word separator
+				if ("bur".equals(langCode) && name != null && !("English".equals(name))) {
+					name = name.replaceAll("(\\S+)", "$1\u200C");
+				}
+				// Create copy with modified name
+				GenericDto newDto = new GenericDto();
+				newDto.setCode(dto.getCode());
+				newDto.setName(name);
+				comboBox.getItems().add(newDto);
+			});
+			new ComboBoxAutoComplete<>(comboBox);
 			comboBox.hide();
-
 		}
 	}
 

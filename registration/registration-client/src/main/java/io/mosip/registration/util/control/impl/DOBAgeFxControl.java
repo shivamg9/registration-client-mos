@@ -82,7 +82,12 @@ public class DOBAgeFxControl extends FxControl {
 
 		List<String> labels = new ArrayList<>();
 		getRegistrationDTo().getSelectedLanguagesByApplicant().forEach(lCode -> {
-			labels.add(this.uiFieldDTO.getLabel().get(lCode));
+			String labelText = this.uiFieldDTO.getLabel().get(lCode);
+			// Apply suffix only if language is Burmese
+			if (labelText != null && "bur".equals(lCode)) {
+				labelText = labelText.replaceAll("(\\S+)", "$1\u200C");
+			}
+			labels.add(labelText);
 		});
 
 		/** DOB Label */

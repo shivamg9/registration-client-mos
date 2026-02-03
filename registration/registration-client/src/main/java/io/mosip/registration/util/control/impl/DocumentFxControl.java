@@ -518,7 +518,12 @@ private void showFullDocumentPreview(DocumentDto documentDto) {
 
 		List<String> labels = new ArrayList<>();
 		getRegistrationDTo().getSelectedLanguagesByApplicant().forEach(lCode -> {
-			labels.add(this.uiFieldDTO.getLabel().get(lCode));
+			String labelText = this.uiFieldDTO.getLabel().get(lCode);
+			// Apply Burmese separator
+			if (labelText != null && "bur".equals(lCode)) {
+				labelText = labelText.replaceAll("(\\S+)", "$1\u200C");
+			}
+			labels.add(labelText);
 		});
 		String titleText = String.join(RegistrationConstants.SLASH, labels) + getMandatorySuffix(uiFieldDTO);
 
@@ -548,7 +553,12 @@ private void showFullDocumentPreview(DocumentDto documentDto) {
 				for (String langCode : getRegistrationDTo().getSelectedLanguagesByApplicant()) {
 					DocumentType documentType = masterSyncService.getDocumentType(selectedCode, langCode);
 					if (documentType != null) {
-						toolTipTextList.add(documentType.getName());
+						String name = documentType.getName();
+						// Apply Burmese separator
+						if ("bur".equals(langCode) && name != null && !("English".equals(name))) {
+							name = name.replaceAll("(\\S+)", "$1\u200C");
+						}
+						toolTipTextList.add(name);
 					}
 				}
 				Label messageLabel = (Label) getField(uiFieldDTO.getId() + RegistrationConstants.MESSAGE);
