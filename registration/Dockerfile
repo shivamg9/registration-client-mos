@@ -59,7 +59,7 @@ RUN sed -i 's|http://deb.debian.org|http://archive.debian.org|g' /etc/apt/source
 # --- JavaFX system properties (software rendering & font dir) ---
 ENV JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8 \
 -Dsun.jnu.encoding=UTF-8 \
--Djavafx.font.fallback=false \
+-Djavafx.font.fallback=platform \
 -Dprism.order=sw \
 -Dprism.text=t2k \
 -Dprism.fontdir=/usr/share/fonts/truetype/myanmar"
