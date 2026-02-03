@@ -1,7 +1,8 @@
 # ------------------------------------------------------------
 # Base image UPDATED to Java 17 (JavaFX 17 compatible)
 # ------------------------------------------------------------
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk-jammy
+
 
 # ------------------------------------------------------------
 # Build metadata (UNCHANGED)
