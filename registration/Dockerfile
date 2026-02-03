@@ -38,23 +38,50 @@ ARG container_user_uid=1001
 ARG container_user_gid=1001
 
 # Install packages, create user, and setup Burmese Fonts/Shaping libraries
+# RUN sed -i 's|http://deb.debian.org|http://archive.debian.org|g' /etc/apt/sources.list && \
+#     sed -i 's|http://security.debian.org|http://archive.debian.org|g' /etc/apt/sources.list && \
+#     echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until && \
+#     apt-get -y update && \
+#     apt-get install -y --no-install-recommends \
+#     unzip \
+#     zip \
+#     nginx \
+#     fontconfig \
+#     fonts-sil-padauk \
+#     libpango-1.0-0 \
+#     libpangoft2-1.0-0 \
+#     libgtk-3-0 && \
+#     # Refresh font cache so OpenJFX detects Padauk (Burmese)
+#     fc-cache -f -v && \
+#     groupadd -g ${container_user_gid} ${container_user_group} && \
+#     useradd -u ${container_user_uid} -g ${container_user_group} -s /bin/sh -m ${container_user}
+
+# ------------------------------------------------------------
+# System packages (JavaFX shaping deps)
+# ------------------------------------------------------------
 RUN sed -i 's|http://deb.debian.org|http://archive.debian.org|g' /etc/apt/sources.list && \
     sed -i 's|http://security.debian.org|http://archive.debian.org|g' /etc/apt/sources.list && \
     echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until && \
     apt-get -y update && \
     apt-get install -y --no-install-recommends \
-    unzip \
-    zip \
-    nginx \
-    fontconfig \
-    fonts-sil-padauk \
-    libpango-1.0-0 \
-    libpangoft2-1.0-0 \
-    libgtk-3-0 && \
-    # Refresh font cache so OpenJFX detects Padauk (Burmese)
-    fc-cache -f -v && \
+        unzip \
+        zip \
+        nginx \
+        fontconfig \
+        libpango-1.0-0 \
+        libpangoft2-1.0-0 \
+        libgtk-3-0 && \
     groupadd -g ${container_user_gid} ${container_user_group} && \
     useradd -u ${container_user_uid} -g ${container_user_group} -s /bin/sh -m ${container_user}
+
+# ------------------------------------------------------------
+# Install Padauk from project resources
+# ------------------------------------------------------------
+RUN mkdir -p /usr/share/fonts/truetype/myanmar
+COPY registration/registration-client/src/main/resources/fonts/Padauk.ttf \
+     /usr/share/fonts/truetype/myanmar/Padauk.ttf
+COPY 99-myanmar.conf /etc/fonts/conf.d/99-myanmar.conf
+RUN fc-cache -f -v
 
 WORKDIR /home/${container_user}
 ENV work_dir=/home/${container_user}
