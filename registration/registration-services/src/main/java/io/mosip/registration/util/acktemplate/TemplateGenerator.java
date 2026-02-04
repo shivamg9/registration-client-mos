@@ -628,7 +628,11 @@ public class TemplateGenerator extends BaseService {
 		List<String> values = new ArrayList<>();
 		List<String> selectedLanguages = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant();
 		for (String selectedLanguage : selectedLanguages) {
-			values.add(getValue(fieldValue, selectedLanguage));
+			String value= getValue(fieldValue, selectedLanguage);
+			if ("bur".equals(selectedLanguage) && value != null) {
+				value = value.replaceAll("(\\S+)", "$1\u200C");
+			}
+			values.add(value);
 			if (!field.getType().equalsIgnoreCase(RegistrationConstants.SIMPLE_TYPE)) {
 				return String.join(RegistrationConstants.SLASH, values);
 			}
