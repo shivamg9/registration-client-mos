@@ -21,6 +21,7 @@ on:
       - develop
       - MOSIP*
       - mos
+      - mm11
 
 jobs:
   build-regclient:
