@@ -395,7 +395,11 @@ public class TemplateGenerator extends BaseService {
 		List<String> labels = new ArrayList<>();
 		List<String> selectedLanguages = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant();
 		for (String selectedLanguage : selectedLanguages) {
-			labels.add(field.getLabel().get(selectedLanguage));
+			String labelText = field.getLabel().get(selectedLanguage);
+			if ("bur".equals(selectedLanguage) && labelText != null) {
+				labelText = labelText.replaceAll("(\\S+)", "$1\u200C");
+			}
+			labels.add(labelText);
 		}
 		return String.join(RegistrationConstants.SLASH, labels);
 	}
@@ -553,7 +557,13 @@ public class TemplateGenerator extends BaseService {
 		List<String> selectedLanguages = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant();
 		for (String selectedLanguage : selectedLanguages) {
 			ResourceBundle resourceBundle = ApplicationContext.getInstance().getBundle(selectedLanguage, RegistrationConstants.LABELS);
-			labels.add(resourceBundle.containsKey(key) ? resourceBundle.getString(key) : RegistrationConstants.EMPTY);
+			String labelText = resourceBundle.containsKey(key)
+					? resourceBundle.getString(key)
+					: RegistrationConstants.EMPTY;
+			if ("bur".equals(selectedLanguage) && labelText != null) {
+				labelText = labelText.replaceAll("(\\S+)", "$1\u200C");
+			}
+			labels.add(labelText);
 		}
 		return String.join(RegistrationConstants.SLASH, labels);
 	}

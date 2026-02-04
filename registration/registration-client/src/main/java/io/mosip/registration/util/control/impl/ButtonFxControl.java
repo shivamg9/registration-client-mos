@@ -167,6 +167,9 @@ public class ButtonFxControl extends FxControl {
 				if ("bur".equals(langCode) && buttonText != null && !("English".equals(buttonText))) {
 					buttonText = buttonText.replaceAll("(\\S+)", "$1\u200C");
 				}
+				if ("eng".equals(langCode) && buttonText != null && !("English".equals(buttonText))) {
+					buttonText = buttonText.replaceAll("(\\S+)", "$1\u200C");
+				}
 				Button button = new Button(buttonText);
 				button.setId(uiFieldDTO.getId() + genericDto.getCode());
 				hBox.setSpacing(10);
