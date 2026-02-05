@@ -224,12 +224,14 @@ public class HeaderController extends BaseController {
 		setImage(homeSelectionMenuImageView	, RegistrationConstants.HAMBURGER_IMG);
 		setImage(homeImgView	, RegistrationConstants.HOME_IMG);
 
-		registrationOfficerName.setText(SessionContext.userContext().getName());
-		registrationOfficeId.setText(RegistrationSystemPropertiesChecker.getMachineId());
-		registrationOfficeLocation
-				.setText(SessionContext.userContext().getRegistrationCenterDetailDTO().getRegistrationCenterName() + " ("
-						+ SessionContext.userContext().getRegistrationCenterDetailDTO().getRegistrationCenterId()
-						+ ")");
+		registrationOfficerName.setText(applyMyanmarFix(SessionContext.userContext().getName()));
+		registrationOfficeId.setText(applyMyanmarFix(RegistrationSystemPropertiesChecker.getMachineId()));
+		String location =
+				SessionContext.userContext().getRegistrationCenterDetailDTO().getRegistrationCenterName()
+						+ " (" +
+						SessionContext.userContext().getRegistrationCenterDetailDTO().getRegistrationCenterId()
+						+ ")";
+		registrationOfficeLocation.setText(applyMyanmarFix(location));
 		menu.setBackground(Background.EMPTY);
 
 		if ((boolean) SessionContext.map().get(RegistrationConstants.ONBOARD_USER)
@@ -972,4 +974,12 @@ public class HeaderController extends BaseController {
 			settingsHBox.getChildren().add(shortCutHBox);
 		}
 	}
+
+	private String applyMyanmarFix(String text) {
+		if (text != null && text.matches(".*[\\u1000-\\u109F].*")) {
+			return text.replaceAll("([\\u1000-\\u109F]+)", "$1\u200C");
+		}
+		return text;
+	}
+
 }
