@@ -616,7 +616,7 @@ public class GenericController extends BaseController {
 
 		Label navigationLabel = new Label();
 		navigationLabel.getStyleClass().add(NAV_LABEL_CLASS);
-		navigationLabel.setText(processSpecDto.getLabel().get(ApplicationContext.applicationLanguage()));
+		navigationLabel.setText(addZwnjIfMyanmar(processSpecDto.getLabel().get(ApplicationContext.applicationLanguage())));
 		navigationLabel.prefWidthProperty().bind(navigationAnchorPane.widthProperty());
 		navigationLabel.setWrapText(true);
 
@@ -878,10 +878,19 @@ public class GenericController extends BaseController {
 
 			Tab screenTab = new Tab();
 			screenTab.setId(screenDTO.getName()+"_tab");
-			screenTab.setText(tabNameInApplicationLanguage == null ?
-					labels.get(0) : tabNameInApplicationLanguage);
-			screenTab.setTooltip(new Tooltip(String.join(RegistrationConstants.SLASH, labels)));
-
+			screenTab.setText(
+					addZwnjIfMyanmar(
+							tabNameInApplicationLanguage == null ?
+									labels.get(0) : tabNameInApplicationLanguage
+					)
+			);
+			screenTab.setTooltip(
+					new Tooltip(
+							addZwnjIfMyanmar(
+									String.join(RegistrationConstants.SLASH, labels)
+							)
+					)
+			);
 			GridPane screenGridPane = getScreenGridPane(screenDTO.getName());
 			screenGridPane.prefWidthProperty().bind(tabPane.widthProperty());
 			screenGridPane.prefHeightProperty().bind(tabPane.heightProperty());
@@ -2295,6 +2304,17 @@ public class GenericController extends BaseController {
 			}
 		});
 	}
+
+	private String addZwnjIfMyanmar(String text) {
+		if (text == null) return null;
+
+		// Myanmar Unicode range
+		if (text.matches(".*[\\u1000-\\u109F].*")) {
+			return text + "\u200C";
+		}
+		return text;
+	}
+
 
 }
 
