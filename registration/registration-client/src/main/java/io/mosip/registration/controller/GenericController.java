@@ -411,6 +411,19 @@ public class GenericController extends BaseController {
 								generateAlertLanguageSpecific(RegistrationConstants.ERROR, RegistrationConstants.PRE_REG_CONSUMED_PACKET_ERROR);
 								return;
 							}
+							/* Apply ZWNJ ONLY if success */
+							if (responseDTO.getSuccessResponseDTO() != null
+									&& responseDTO.getSuccessResponseDTO().getOtherAttributes() != null
+									&& responseDTO.getSuccessResponseDTO().getOtherAttributes()
+									.containsKey(RegistrationConstants.REGISTRATION_DTO)) {
+
+								RegistrationDTO regDto =
+										(RegistrationDTO) responseDTO.getSuccessResponseDTO()
+												.getOtherAttributes()
+												.get(RegistrationConstants.REGISTRATION_DTO);
+
+								applyZwnjToBurmeseFields(regDto);
+							}
 
 							try {
 								loadPreRegSync(responseDTO);
@@ -1589,7 +1602,7 @@ public class GenericController extends BaseController {
 		if (tf != null) {
 			boolean wasEditable = tf.isEditable();
 			tf.setEditable(true);
-			tf.setText(value);
+			tf.setText(addZwnjIfMyanmar(value));
 			tf.setEditable(wasEditable);
 			LOGGER.debug("SUCCESS: Set value for {} in lang {}", fieldId, langCode);
 		} else {
@@ -2151,6 +2164,18 @@ public class GenericController extends BaseController {
 		}
 
 		try {
+			if (responseDTO.getSuccessResponseDTO() != null
+					&& responseDTO.getSuccessResponseDTO().getOtherAttributes() != null
+					&& responseDTO.getSuccessResponseDTO().getOtherAttributes()
+					.containsKey(RegistrationConstants.REGISTRATION_DTO)) {
+
+				RegistrationDTO regDto =
+						(RegistrationDTO) responseDTO.getSuccessResponseDTO()
+								.getOtherAttributes()
+								.get(RegistrationConstants.REGISTRATION_DTO);
+
+				applyZwnjToBurmeseFields(regDto);
+			}
 			loadPreRegSync(responseDTO);
             if (responseDTO.getSuccessResponseDTO() != null) {
                 String currentTabPaneId = getRegistrationDTOFromSession().getRegistrationId();
@@ -2314,6 +2339,39 @@ public class GenericController extends BaseController {
 		}
 		return text;
 	}
+
+	private void applyZwnjToBurmeseFields(RegistrationDTO dto) {
+		if (dto == null || dto.getDemographics() == null) return;
+
+		dto.getDemographics().forEach((key, value) -> {
+
+			if (value instanceof List) {
+				List<?> list = (List<?>) value;
+
+				for (Object obj : list) {
+					if (obj instanceof SimpleDto) {
+						SimpleDto simple = (SimpleDto) obj;
+
+						if ("bur".equals(simple.getLanguage())
+								&& simple.getValue() != null
+								&& simple.getValue().matches(".*[\\u1000-\\u109F].*")) {
+
+							simple.setValue(simple.getValue() + "\u200C");
+						}
+					}
+				}
+			}
+
+			else if (value instanceof String) {
+				String str = (String) value;
+
+				if (str.matches(".*[\\u1000-\\u109F].*")) {
+					dto.getDemographics().put(key, str + "\u200C");
+				}
+			}
+		});
+	}
+
 
 
 }
