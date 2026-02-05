@@ -880,7 +880,12 @@ public class PacketHandlerController extends BaseController implements Initializ
 		gridPane.addColumn(0, vBox);
 
 		Label label = new Label();
-		label.setText(processSpecDto.getLabel().get(ApplicationContext.applicationLanguage()));
+		String text = processSpecDto.getLabel()
+				.get(ApplicationContext.applicationLanguage());
+		if (text != null && text.matches(".*[\\u1000-\\u109F].*")) {
+			text = text.replaceAll("([\\u1000-\\u109F]+)", "$1\u200C");
+		}
+		label.setText(text);
 		label.setWrapText(true);
 		label.getStyleClass().add("operationalTitle");
 		gridPane.addColumn(1, label);
