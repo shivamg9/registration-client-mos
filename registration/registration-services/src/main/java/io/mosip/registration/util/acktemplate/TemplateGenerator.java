@@ -201,9 +201,9 @@ public class TemplateGenerator extends BaseService {
 												  Map<String, Object> templateValues, String crossImagePath, ResourceBundle firstLanguageProperties)
 			throws RegBaseCheckedException {
 
-		templateValues.put("Fingers", firstLanguageProperties.getString("FingersLabel"));
-		templateValues.put("Iris", firstLanguageProperties.getString("IrisLabel"));
-		templateValues.put("Face", firstLanguageProperties.getString("FaceLabel"));
+		templateValues.put("Fingers", fixBurmeseText(firstLanguageProperties.getString("FingersLabel")));
+		templateValues.put("Iris", fixBurmeseText(firstLanguageProperties.getString("IrisLabel")));
+		templateValues.put("Face", fixBurmeseText(firstLanguageProperties.getString("FaceLabel")));
 
 		List<BiometricsDto> capturedList = new ArrayList<>();
 		for (String attribute : field.getBioAttributes()) {
@@ -332,7 +332,10 @@ public class TemplateGenerator extends BaseService {
 		if(registration.getDocuments().get(field.getId()) != null) {
 			data = new HashMap<>();
 			data.put("label", getFieldLabel(field));
-			data.put("category", registration.getDocuments().get(field.getId()).getCategory());
+			String langCode = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant().get(0);
+			String category = registration.getDocuments().get(field.getId()).getCategory();
+			data.put("category", fixBurmeseText(category));
+//			data.put("category", registration.getDocuments().get(field.getId()).getCategory());
 			data.put("value", registration.getDocuments().get(field.getId()).getValue());
 			data.put("format", registration.getDocuments().get(field.getId()).getFormat());
 			data.put("refNumber", registration.getDocuments().get(field.getId()).getRefNumber());
@@ -396,9 +399,7 @@ public class TemplateGenerator extends BaseService {
 		List<String> selectedLanguages = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant();
 		for (String selectedLanguage : selectedLanguages) {
 			String labelText = field.getLabel().get(selectedLanguage);
-			if ("bur".equals(selectedLanguage) && labelText != null) {
-				labelText = labelText.replaceAll("(\\S+)", "$1\u200C");
-			}
+			labelText = fixBurmeseText(labelText);
 			labels.add(labelText);
 		}
 		return String.join(RegistrationConstants.SLASH, labels);
@@ -437,7 +438,15 @@ public class TemplateGenerator extends BaseService {
 			templateValues.put(RegistrationConstants.TEMPLATE_UIN, registration.getDemographics().get("UIN"));
 			templateValues.put(RegistrationConstants.TEMPLATE_PRE_REG_ID_LABEL, getLabel("preRegistrationId"));
 			templateValues.put(RegistrationConstants.TEMPLATE_PRE_REG_ID, registration.getPreRegistrationId());
-			templateValues.put(RegistrationConstants.TEMPLATE_MODIFY, firstLanguageProperties.getString("modify"));
+
+			// --- MODIFIED BLOCK 1 ---
+			templateValues.put(RegistrationConstants.TEMPLATE_MODIFY,
+					fixBurmeseText(firstLanguageProperties.getString("modify")));
+
+			templateValues.put(RegistrationConstants.TEMPLATE_IMPORTANT_GUIDELINES,
+					fixBurmeseText(firstLanguageProperties.getString("importantguidelines")));
+			// ------------------------
+
 			templateValues.put(RegistrationConstants.TEMPLATE_MODIFY_IMAGE_SOURCE, getEncodedImage(RegistrationConstants.TEMPLATE_MODIFY_IMAGE_PATH,
 					RegistrationConstants.TEMPLATE_PNG_IMAGE_ENCODING));
 			generateQRCode(registration, templateValues, firstLanguageProperties);
@@ -452,7 +461,14 @@ public class TemplateGenerator extends BaseService {
 			templateValues.put(RegistrationConstants.TEMPLATE_RO_NAME, getValue(registration.getOsiDataDTO().getOperatorID()));
 			templateValues.put(RegistrationConstants.TEMPLATE_REG_CENTER_LABEL, getLabel("registrationcenter"));
 			templateValues.put(RegistrationConstants.TEMPLATE_REG_CENTER, SessionContext.userContext().getRegistrationCenterDetailDTO().getRegistrationCenterName());
-			templateValues.put(RegistrationConstants.TEMPLATE_IMPORTANT_GUIDELINES, firstLanguageProperties.getString("importantguidelines"));
+
+			// --- MODIFIED BLOCK 2 ---
+//			String guidelinesText = firstLanguageProperties.getString("importantguidelines");
+//			if ("bur".equals(langCode) && guidelinesText != null) {
+//				guidelinesText = guidelinesText.replaceAll("(\\S+)", "$1\u200C");
+//			}
+//			templateValues.put(RegistrationConstants.TEMPLATE_IMPORTANT_GUIDELINES, guidelinesText);
+			// ------------------------
 
 			templateValues.put(RegistrationConstants.TEMPLATE_DEMO_INFO, getLabel("demographicInformation"));
 			templateValues.put(RegistrationConstants.TEMPLATE_DOCUMENTS_LABEL, getLabel("documents"));
@@ -475,7 +491,7 @@ public class TemplateGenerator extends BaseService {
 			setErrorResponse(responseDTO, ex.getMessage(), null);
 		}
 	}
-
+	
 
 	private List<byte[]> getImageFromISO(Modality modality, List<BiometricsDto> biometricsDtos) {
 		List<byte[]> images = new LinkedList<>();
@@ -560,9 +576,7 @@ public class TemplateGenerator extends BaseService {
 			String labelText = resourceBundle.containsKey(key)
 					? resourceBundle.getString(key)
 					: RegistrationConstants.EMPTY;
-			if ("bur".equals(selectedLanguage) && labelText != null) {
-				labelText = labelText.replaceAll("(\\S+)", "$1\u200C");
-			}
+			labelText = fixBurmeseText(labelText);
 			labels.add(labelText);
 		}
 		return String.join(RegistrationConstants.SLASH, labels);
@@ -619,6 +633,7 @@ public class TemplateGenerator extends BaseService {
 				value = value.replaceAll(word, "<mark>"+word+"</mark>");
 			}
 		}
+		value = fixBurmeseText(value);
 
 		return value == null ? RegistrationConstants.EMPTY : value;
 	}
@@ -629,9 +644,7 @@ public class TemplateGenerator extends BaseService {
 		List<String> selectedLanguages = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant();
 		for (String selectedLanguage : selectedLanguages) {
 			String value= getValue(fieldValue, selectedLanguage);
-			if ("bur".equals(selectedLanguage) && value != null) {
-				value = value.replaceAll("(\\S+)", "$1\u200C");
-			}
+			value = fixBurmeseText(value);
 			values.add(value);
 			if (!field.getType().equalsIgnoreCase(RegistrationConstants.SIMPLE_TYPE)) {
 				return String.join(RegistrationConstants.SLASH, values);
@@ -830,5 +843,15 @@ public class TemplateGenerator extends BaseService {
 					ExceptionUtils.getStackTrace(exception));
 		}
 		return time + RegistrationConstants.UTC_APPENDER;
+	}
+	private String fixBurmeseText(String text) {
+		if (text == null) return null;
+
+		// Check if text contains Burmese Unicode characters (U+1000 to U+109F)
+		if (text.matches(".*[\\u1000-\\u109F].*")) {
+			// Append ZWNJ (\u200C) to the end of every non-whitespace sequence (word)
+			return text.replaceAll("(\\S+)", "$1\u200C");
+		}
+		return text;
 	}
 }
