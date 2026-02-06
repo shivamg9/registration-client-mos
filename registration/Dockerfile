@@ -53,6 +53,9 @@ ARG container_user_gid=1001
 # ------------------------------------------------------------
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openjfx \
+    fonts-noto-core \
+    fonts-noto-extra \
+    libharfbuzz0b \
     fontconfig \
     libfreetype6 \
     libharfbuzz0b \
@@ -75,6 +78,7 @@ ENV JAVA_TOOL_OPTIONS="\
 -Dfile.encoding=UTF-8 \
 -Dsun.jnu.encoding=UTF-8 \
 -Dprism.order=sw \
+-Djavafx.text=harfbuzz \
 -Djavafx.font.fallback=true"
 
 # ------------------------------------------------------------
