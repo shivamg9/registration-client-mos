@@ -850,7 +850,7 @@ public class TemplateGenerator extends BaseService {
 		// Check if text contains Burmese Unicode characters (U+1000 to U+109F)
 		if (text.matches(".*[\\u1000-\\u109F].*")) {
 			// Append ZWNJ (\u200C) to the end of every non-whitespace sequence (word)
-			return text.replaceAll("(\\S+)", "$1\u200C");
+			return text.replaceAll("([\u1000-\u1021\u103F](?!\u103A))", "$1\u200C");
 		}
 		return text;
 	}
