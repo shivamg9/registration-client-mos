@@ -866,7 +866,7 @@ public class TemplateGenerator extends BaseService {
             result.append(c);
 
             if (!inTag && c >= '\u1000' && c <= '\u109F') {
-                result.append('\u200C');
+                result.append('\u200D');
             }
         }
 
