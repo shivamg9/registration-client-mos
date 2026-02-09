@@ -845,28 +845,31 @@ public class TemplateGenerator extends BaseService {
 		return time + RegistrationConstants.UTC_APPENDER;
 	}
 	private String fixBurmeseText(String html) {
-		StringBuilder result = new StringBuilder();
-		boolean inTag = false;
+        if (html == null || html.isEmpty()) {
+            return html;
+        }
 
-		for (int i = 0; i < html.length(); i++) {
-			char c = html.charAt(i);
+        StringBuilder result = new StringBuilder(html.length() + 20);
+        boolean inTag = false;
 
-			// Track if we're inside an HTML tag
-			if (c == '<') inTag = true;
-			if (c == '>') {
-				inTag = false;
-				result.append(c);
-				continue;
-			}
+        for (int i = 0; i < html.length(); i++) {
+            char c = html.charAt(i);
 
-			result.append(c);
+            if (c == '<') inTag = true;
 
-			// Only add zero-width space outside of tags
-			if (!inTag && c >= '\u1000' && c <= '\u109F') {
-				result.append('\u200B'); // Zero-width space
-			}
-		}
+            if (c == '>') {
+                inTag = false;
+                result.append(c);
+                continue;
+            }
 
-		return result.toString();
-	}
+            result.append(c);
+
+            if (!inTag && c >= '\u1000' && c <= '\u109F') {
+                result.append('\u200B');
+            }
+        }
+
+        return result.toString();
+    }
 }
