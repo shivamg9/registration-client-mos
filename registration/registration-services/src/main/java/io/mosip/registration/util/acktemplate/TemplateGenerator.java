@@ -844,32 +844,14 @@ public class TemplateGenerator extends BaseService {
 		}
 		return time + RegistrationConstants.UTC_APPENDER;
 	}
-	private String fixBurmeseText(String html) {
-        if (html == null || html.isEmpty()) {
-            return html;
-        }
+	private String fixBurmeseText(String text) {
+    if (text == null) return null;
 
-        StringBuilder result = new StringBuilder(html.length() + 20);
-        boolean inTag = false;
-
-        for (int i = 0; i < html.length(); i++) {
-            char c = html.charAt(i);
-
-            if (c == '<') inTag = true;
-
-            if (c == '>') {
-                inTag = false;
-                result.append(c);
-                continue;
-            }
-
-            result.append(c);
-
-            if (!inTag && c >= '\u1000' && c <= '\u109F') {
-                result.append('\u200D');
-            }
-        }
-
-        return result.toString();
+    // Check if text contains Burmese Unicode characters (U+1000 to U+109F)
+    if (text.matches(".*[\\u1000-\\u109F].*")) {
+       // Append ZWNJ (\u200C) to the end of every non-whitespace sequence (word)
+      return text.replaceAll("(\\S+)", "$1\u200C");
     }
+    return text;
+}
 }
