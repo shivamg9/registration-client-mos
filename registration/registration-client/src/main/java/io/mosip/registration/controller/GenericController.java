@@ -124,6 +124,7 @@ public class GenericController extends BaseController {
 	private TextField nrcNumber;
 	private TextField constructedPridTextField;
 	private Button nrcFetchBtn;
+	private Button brmsFetchBtn;
 
 	private ProgressIndicator progressIndicator;
 	
@@ -148,6 +149,9 @@ public class GenericController extends BaseController {
 
 	@Autowired
 	private PreRegistrationDataSyncService preRegistrationDataSyncService;
+
+	@Autowired
+	private io.mosip.registration.service.sync.BrmsDataSyncService brmsDataSyncService;
 
 	@Autowired
 	private io.mosip.registration.service.sync.MasterSyncService masterSyncService;
@@ -356,7 +360,14 @@ public class GenericController extends BaseController {
 				.getString("fetch"));
 		nrcFetchBtn.setOnAction(event -> fetchNrcData());
 
-		nrcButtonHBox.getChildren().add(nrcFetchBtn);
+		// BRMS Fetch Button
+		brmsFetchBtn = new Button();
+		brmsFetchBtn.setId("brmsFetchBtn");
+		brmsFetchBtn.getStyleClass().add("demoGraphicPaneContentButton");
+		brmsFetchBtn.setText("BRMS Fetch");
+		brmsFetchBtn.setOnAction(event -> fetchBrmsData());
+
+		nrcButtonHBox.getChildren().addAll(nrcFetchBtn, brmsFetchBtn);
 
 		nrcSection.getChildren().addAll(nrcTitleLabel, nrcLabel, nrcInputHBox, nrcButtonHBox);
 
@@ -2329,6 +2340,484 @@ public class GenericController extends BaseController {
 			}
 		});
 	}
+
+	@FXML
+	private void fetchBrmsData() {
+		String displayNrc = nrcNumber != null ? nrcNumber.getText() : "";
+
+		if (displayNrc == null || displayNrc.trim().isEmpty()) {
+			generateAlertLanguageSpecific(
+					RegistrationConstants.ERROR,
+					"Please construct NRC number first"
+			);
+			return;
+		}
+
+		executeBrmsSearchTask(displayNrc);
+	}
+
+	private void executeBrmsSearchTask(String nrc) {
+		String cleanNrc = nrc;
+		LOGGER.info("Starting BRMS fetch for NRC: [{}]", cleanNrc);
+
+		genericScreen.setDisable(true);
+		if (progressIndicator != null) progressIndicator.setVisible(true);
+
+		Service<ResponseDTO> searchService = new Service<ResponseDTO>() {
+			@Override
+			protected Task<ResponseDTO> createTask() {
+				return new Task<ResponseDTO>() {
+					@Override
+					protected ResponseDTO call() throws Exception {
+						LOGGER.info("Calling BRMS API with NRC: {}", cleanNrc);
+						return brmsDataSyncService.getCitizenDataByNrc(cleanNrc);
+					}
+				};
+			}
+		};
+
+		searchService.setOnSucceeded(event -> {
+			handleBrmsSearchResponse(searchService.getValue(), cleanNrc);
+		});
+
+		searchService.setOnFailed(event -> {
+			LOGGER.error("BRMS NRC search task failed", searchService.getException());
+			handleBrmsSearchResponse(null, cleanNrc);
+		});
+
+		searchService.start();
+	}
+
+
+	/**
+	 * Handle the response from BRMS NRC search
+	 */
+	private void handleBrmsSearchResponse(ResponseDTO responseDTO, String nrcNumber) {
+		try {
+			genericScreen.setDisable(false);
+			if (progressIndicator != null) progressIndicator.setVisible(false);
+
+			if (responseDTO == null || responseDTO.getErrorResponseDTOs() != null && !responseDTO.getErrorResponseDTOs().isEmpty()) {
+				String errorMessage = "Failed to find citizen data for the given NRC";
+				if (responseDTO != null && responseDTO.getErrorResponseDTOs() != null && !responseDTO.getErrorResponseDTOs().isEmpty()) {
+					errorMessage = responseDTO.getErrorResponseDTOs().get(0).getMessage();
+				}
+				generateAlertLanguageSpecific(RegistrationConstants.ERROR, errorMessage);
+				return;
+			}
+
+			LOGGER.info("Successfully received BRMS data for NRC: [{}]", nrcNumber);
+
+			// If successful, the response should contain the citizen data
+			handleBrmsDataResponse(responseDTO, nrcNumber);
+
+		} catch (Exception exception) {
+			LOGGER.error("Error handling BRMS search response", exception);
+			generateAlertLanguageSpecific(RegistrationConstants.ERROR, "Error processing BRMS data");
+		}
+	}
+
+	/**
+	 * Handle BRMS data response and map to UI fields
+	 */
+	@SuppressWarnings("unchecked")
+	private void handleBrmsDataResponse(ResponseDTO responseDTO, String nrcNumber) {
+		try {
+			LOGGER.info("Processing BRMS citizen data for NRC: {}", nrcNumber);
+
+			// Get citizen data from response
+			Map<String, Object> citizenData;
+			if (responseDTO.getSuccessResponseDTO() != null &&
+					responseDTO.getSuccessResponseDTO().getOtherAttributes() != null) {
+				citizenData = (Map<String, Object>) responseDTO.getSuccessResponseDTO()
+						.getOtherAttributes().get("citizenData");
+			} else {
+				citizenData = null;
+			}
+
+			if (citizenData == null || citizenData.isEmpty()) {
+				generateAlertLanguageSpecific(RegistrationConstants.ERROR, "No citizen data found");
+				return;
+			}
+
+			LOGGER.info("Mapping BRMS data to UI fields...");
+
+			// Get selected languages
+			List<String> languages = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant();
+
+			// Map BRMS fields to UI spec fields
+			Platform.runLater(() -> {
+
+				mapBrmsDataToUiFields(citizenData, languages);
+
+				// Delay NRC mapping slightly to allow dropdown population
+				Platform.runLater(() -> mapBrmsNrcComponents(citizenData, languages));
+
+			});
+
+			// Show success message
+			generateAlertLanguageSpecific(RegistrationConstants.ALERT_INFORMATION,
+					"Citizen data loaded successfully from BRMS");
+
+		} catch (Exception exception) {
+			LOGGER.error("Error processing BRMS data response", exception);
+			generateAlertLanguageSpecific(RegistrationConstants.ERROR, "Error mapping BRMS data to form fields");
+		}
+	}
+
+	/**
+	 * Map BRMS data fields to UI spec fields
+	 */
+	private void mapBrmsDataToUiFields(
+			Map<String, Object> citizenData,
+			List<String> languages) {
+
+		LOGGER.info("Mapping BRMS data to UI fields (with dropdown support)");
+
+		for (String langCode : languages) {
+
+			/* -------------------------------
+			 * TEXT FIELDS
+			 * ------------------------------- */
+			setFieldValue("fullName", langCode,
+					(String) citizenData.get("fullname"));
+
+			setFieldValue("fullNameEnglish", langCode,
+					(String) citizenData.get("fullnameEnglish"));
+
+			// ----- DOB + AGE (MOSIP CORRECT) -----
+			setDobUsingFxControl("dateOfBirth",
+					(String) citizenData.get("realdob"));
+
+
+			setFieldValue("fathersName", langCode,
+					(String) citizenData.get("fatherName"));
+
+			setFieldValue("mothersName", langCode,
+					(String) citizenData.get("motherName"));
+
+			setFieldValue("phone", langCode,
+					(String) citizenData.get("phoneNumber"));
+			// Gender
+			String gender = normalizeGender(
+					(String) citizenData.get("gender"), langCode);
+			selectDropdownValue("gender", gender, langCode);
+
+			// Blood Group
+			selectDropdownValue(
+					"bloodType",
+					(String) citizenData.get("bloodGroup"),
+					langCode
+			);
+
+			// Ethnicity / Race
+			selectDropdownValue(
+					"ethnicity",
+					(String) citizenData.get("raceName"),
+					langCode
+			);
+
+			// Religion
+			selectDropdownValue(
+					"religion",
+					(String) citizenData.get("rename"),
+					langCode
+			);
+
+			// Occupation
+			selectDropdownValue(
+					"occupation",
+					(String) citizenData.get("jobName"),
+					langCode
+			);
+
+			// City
+			selectDropdownValue(
+					"cityCode",
+					(String) citizenData.get("cityCode"),
+					langCode
+			);
+
+			LOGGER.info("BRSM DATA MAPPING COMPLETED SUCCESSFULLY");
+
+		}
+		String primaryLang = languages.get(0);
+		mapBrmsAddressHierarchically(citizenData, primaryLang);
+
+		LOGGER.info("BRMS → UI mapping completed");
+	}
+
+	@SuppressWarnings("unchecked")
+	private void selectDropdownValue(String fieldId, String brmsValue, String langCode) {
+
+		if (brmsValue == null || brmsValue.trim().isEmpty()) {
+			return;
+		}
+
+		FxControl fxControl = getFxControl(fieldId);
+
+		if (!(fxControl instanceof DropDownFxControl)) {
+			LOGGER.warn("Field {} is not a dropdown", fieldId);
+			return;
+		}
+
+		DropDownFxControl dropdown = (DropDownFxControl) fxControl;
+		ComboBox<GenericDto> comboBox =
+				findNode(dropdown.getNode(), ComboBox.class);
+
+		if (comboBox == null) {
+			LOGGER.error("ComboBox not found for {}", fieldId);
+			return;
+		}
+
+		List<GenericDto> options = dropdown.getPossibleValues(langCode);
+
+		for (GenericDto option : options) {
+
+			boolean match =
+					option.getCode().equalsIgnoreCase(brmsValue)    // (C)
+							|| option.getName().equalsIgnoreCase(brmsValue)
+							|| option.getCode().replace("(", "").replace(")", "")
+							.equalsIgnoreCase(brmsValue)
+							|| option.getName().replace("(", "").replace(")", "")
+							.equalsIgnoreCase(brmsValue);
+
+
+			if (match) {
+				comboBox.setValue(option);
+
+				// IMPORTANT: update DTO with CODE
+				getRegistrationDTOFromSession()
+						.SELECTED_CODES
+						.put(fieldId + "Code", option.getCode());
+
+				dropdown.setData(option.getCode());
+
+				LOGGER.info(
+						"Dropdown [{}] mapped -> name='{}', code='{}'",
+						fieldId, option.getName(), option.getCode()
+				);
+				return;
+			}
+		}
+
+
+		LOGGER.warn(
+				"No dropdown match found for field [{}] with BRMS value [{}]",
+				fieldId, brmsValue
+		);
+	}
+
+	private String normalizeGender(String brmsGender, String langCode) {
+		if (brmsGender == null) return null;
+
+		brmsGender = brmsGender.trim();
+
+		if ("မ".equals(brmsGender)) {
+			return langCode.equals("bur") ? "မ" : "Female";
+		}
+		if ("က".equals(brmsGender) || "အဖ".equals(brmsGender)) {
+			return langCode.equals("bur") ? "က" : "Male";
+		}
+		return brmsGender;
+	}
+
+	private void mapBrmsNrcComponents(
+			Map<String, Object> citizenData,
+			List<String> languages) {
+
+		LOGGER.info("Mapping BRMS NRC components atomically");
+
+		String primaryLang = languages.get(0); // bur always first
+
+		/* -----------------------------
+		 * NRC CODE (LANG-INDEPENDENT)
+		 * ----------------------------- */
+		String nrcCodeEng = (String) citizenData.get("nrcCodeEng");
+		if (nrcCodeEng != null) {
+			selectDropdownValue("nrcCode",
+					nrcCodeEng.replace("/", "").trim(),
+					primaryLang);
+		}
+
+		/* -----------------------------
+		 * CITY CODE
+		 * ----------------------------- */
+		String cityCodeEng = (String) citizenData.get("cityCodeEng");
+		if (cityCodeEng != null) {
+			selectDropdownValue("cityCode", cityCodeEng, primaryLang);
+		}
+
+		/* -----------------------------
+		 * RESIDENCE STATUS
+		 * ----------------------------- */
+		String citizenType = (String) citizenData.get("citizenTypeEng"); // C / N / A
+		if (citizenType != null) {
+			String masterCode = "(" + citizenType.trim() + ")"; // -> (C)
+			selectDropdownValue("residenceStatus", masterCode, primaryLang);
+		}
+
+
+		/* -----------------------------
+		 * NRC DIGITS (SET ONCE)
+		 * ----------------------------- */
+		String digitsMm = (String) citizenData.get("nrcNumberMm");
+		if (digitsMm != null) {
+			String engDigits = toEnglishDigits(digitsMm);
+
+			for (String lang : languages) {
+				setFieldValue(
+						"nrcNumberPart",
+						lang,
+						"bur".equals(lang)
+								? toBurmeseDigits(engDigits)
+								: engDigits
+				);
+			}
+		}
+
+		/* -----------------------------
+		 * CONCATENATE ONCE (LAST)
+		 * ----------------------------- */
+		Platform.runLater(() -> {
+			LOGGER.info("Triggering NRC concatenation after BRMS mapping");
+			handleNrcConcatenation("nrc");
+		});
+	}
+
+
+	private void setDobUsingFxControl(String fieldId, String brmsDob) {
+
+		if (brmsDob == null || brmsDob.isBlank()) return;
+
+		try {
+			FxControl fxControl = getFxControl(fieldId);
+
+			if (!(fxControl instanceof DOBFxControl) &&
+					!(fxControl instanceof DOBAgeFxControl)) {
+				LOGGER.error("Field {} is not a DOB control", fieldId);
+				return;
+			}
+
+			// 🔥 MOSIP expects yyyy/MM/dd
+			String mosipDob = brmsDob.replace("-", "/"); // 1965/05/15
+
+			// Set DTO (language-wise)
+			List<SimpleDto> dobList = new ArrayList<>();
+			for (String lang : getRegistrationDTOFromSession().getSelectedLanguagesByApplicant()) {
+				dobList.add(new SimpleDto(lang, mosipDob));
+			}
+			fxControl.setData(dobList);
+
+			// Trigger UI + age calculation
+			fxControl.selectAndSet(mosipDob);
+
+			LOGGER.info("DOB set successfully via FxControl: {}", mosipDob);
+
+		} catch (Exception e) {
+			LOGGER.error("Failed to set DOB from BRMS value: {}", brmsDob, e);
+		}
+	}
+
+	private void mapBrmsAddressHierarchically(
+			Map<String, Object> citizenData,
+			String langCode
+	) {
+		LOGGER.info("🔥 STARTING ADDRESS HIERARCHY MAPPING");
+
+		// REGION
+		String regionCode = selectAndGetCode(
+				"region",
+				(String) citizenData.get("dname"),
+				langCode
+		);
+		if (regionCode == null) return;
+
+		// DISTRICT
+		loadChildLocations("District", regionCode, langCode);
+		String districtCode = selectAndGetCode(
+				"District",
+				(String) citizenData.get("diName"),
+				langCode
+		);
+		if (districtCode == null) return;
+
+		// TOWNSHIP
+		loadChildLocations("Township", districtCode, langCode);
+		String townshipCode = selectAndGetCode(
+				"Township",
+				(String) citizenData.get("townshipName"),
+				langCode
+		);
+		if (townshipCode == null) return;
+
+		// SUB-TOWNSHIP
+		loadChildLocations("Sub-Township", townshipCode, langCode);
+		String subTownshipCode = selectAndGetCode(
+				"Sub-Township",
+				(String) citizenData.get("stname"),
+				langCode
+		);
+		if (subTownshipCode == null) return;
+
+		// QUARTER
+		loadChildLocations("Quarter", subTownshipCode, langCode);
+		String quarterCode = selectAndGetCode(
+				"Quarter",
+				(String) citizenData.get("qname"),
+				langCode
+		);
+		if (quarterCode == null) return;
+
+		// VILLAGE
+		loadChildLocations("Village", quarterCode, langCode);
+		selectDropdownValue(
+				"Village",
+				(String) citizenData.get("vname"),
+				langCode
+		);
+	}
+
+	private void loadChildLocations(
+			String childFieldId,
+			String parentLocCode,
+			String langCode
+	) {
+		FxControl fx = getFxControl(childFieldId);
+		if (!(fx instanceof DropDownFxControl)) return;
+
+		DropDownFxControl dropdown = (DropDownFxControl) fx;
+		ComboBox<GenericDto> combo =
+				findNode(dropdown.getNode(), ComboBox.class);
+
+		if (combo == null) return;
+
+		List<GenericDto> children =
+				masterSyncService.getFieldValues(parentLocCode, langCode, true);
+
+		LOGGER.info(
+				"Loaded {} items for [{}] using parentCode={}",
+				children != null ? children.size() : 0,
+				childFieldId,
+				parentLocCode
+		);
+
+		combo.getItems().clear();
+		if (children != null) {
+			combo.getItems().addAll(children);
+		}
+	}
+
+	private String selectAndGetCode(
+			String fieldId,
+			String value,
+			String langCode
+	) {
+		selectDropdownValue(fieldId, value, langCode);
+		return getSelectedCodeValue(fieldId);
+	}
+
+
 
 	private String addZwnjIfMyanmar(String text) {
 		if (text == null) return null;
