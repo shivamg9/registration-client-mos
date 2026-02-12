@@ -4,6 +4,16 @@ import static io.mosip.registration.constants.LoggerConstants.LOG_TEMPLATE_GENER
 import static io.mosip.registration.constants.RegistrationConstants.APPLICATION_ID;
 import static io.mosip.registration.constants.RegistrationConstants.APPLICATION_NAME;
 
+import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -190,7 +200,7 @@ public class TemplateGenerator extends BaseService {
 			responseMap.put(RegistrationConstants.TEMPLATE_NAME, writer);
 			setSuccessResponse(response, RegistrationConstants.SUCCESS, responseMap);
 
-		} catch (RuntimeException | IOException runtimeException) {
+		} catch (Exception runtimeException) {
 			setErrorResponse(response, RegistrationConstants.TEMPLATE_GENERATOR_ACK_RECEIPT_EXCEPTION, null);
 			LOGGER.error(runtimeException.getMessage(), runtimeException);
 		}
@@ -405,22 +415,20 @@ public class TemplateGenerator extends BaseService {
 		return String.join(RegistrationConstants.SLASH, labels);
 	}
 
-	private Map<String, Object> getDemographicData(RegistrationDTO registration, UiFieldDTO field) {
+	private Map<String, Object> getDemographicData(RegistrationDTO registration, UiFieldDTO field) throws Exception {
 		Map<String, Object> data = null;
-		if("UIN".equalsIgnoreCase(field.getId()) || "IDSchemaVersion".equalsIgnoreCase(field.getId()))
+		if ("UIN".equalsIgnoreCase(field.getId()) ||
+				"IDSchemaVersion".equalsIgnoreCase(field.getId()))
 			return null;
-
 		String value = getValue(registration.getDemographics().get(field.getId()));
 		if (value != null && !value.isEmpty()) {
 			data = new HashMap<>();
 			String fieldLabel = getFieldLabel(field);
 			String fieldValue = getFieldValue(field);
+			fieldLabel = convertTextToBase64Image(fieldLabel);
+			fieldValue = convertTextToBase64Image(fieldValue);
 			data.put("label", fieldLabel);
 			data.put("value", fieldValue);
-
-			//Added for backward compatibility(1.1.5.5 & 1.1.4.*), this support will be removed from next version
-			data.put("primaryLabel", fieldLabel);
-			data.put("primaryValue", fieldValue);
 		}
 		return data;
 	}
@@ -568,19 +576,28 @@ public class TemplateGenerator extends BaseService {
 		}
 	}
 
-	private String getLabel(String key) {
-		List<String> labels = new ArrayList<>();
-		List<String> selectedLanguages = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant();
-		for (String selectedLanguage : selectedLanguages) {
-			ResourceBundle resourceBundle = ApplicationContext.getInstance().getBundle(selectedLanguage, RegistrationConstants.LABELS);
-			String labelText = resourceBundle.containsKey(key)
-					? resourceBundle.getString(key)
-					: RegistrationConstants.EMPTY;
-			labelText = fixBurmeseText(labelText);
-			labels.add(labelText);
-		}
-		return String.join(RegistrationConstants.SLASH, labels);
-	}
+    private String getLabel(String key) {
+        List<String> labels = new ArrayList<>();
+        List<String> selectedLanguages = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant();
+        for (String selectedLanguage : selectedLanguages) {
+            ResourceBundle resourceBundle = ApplicationContext.getInstance().getBundle(selectedLanguage, RegistrationConstants.LABELS);
+            String labelText = resourceBundle.containsKey(key)
+                    ? resourceBundle.getString(key)
+                    : RegistrationConstants.EMPTY;
+
+            // --- FIX START: Wrap in try-catch ---
+            try {
+                labelText = convertTextToBase64Image(labelText);
+            } catch (Exception e) {
+                LOGGER.error("Failed to convert label to image for key: " + key, e);
+                // If conversion fails, labelText remains as the original string (fallback)
+            }
+            // --- FIX END ---
+
+            labels.add(labelText);
+        }
+        return String.join(RegistrationConstants.SLASH, labels);
+    }
 
 	private String getEncodedImage(String imagePath, String encoding) throws RegBaseCheckedException {
 		try {
@@ -854,4 +871,40 @@ public class TemplateGenerator extends BaseService {
     }
     return text;
 }
+
+	private String convertTextToBase64Image(String text) throws Exception {
+
+		// Use getResourceAsStream to load from src/main/resources/fonts/
+		InputStream fontStream = this.getClass().getResourceAsStream("/fonts/NotoSansMyanmar-Regular.ttf");
+		Font font = Font.createFont(Font.TRUETYPE_FONT, fontStream).deriveFont(28f);
+
+		// Measure text
+		BufferedImage tempImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D tempG2d = tempImage.createGraphics();
+		tempG2d.setFont(font);
+		FontMetrics fm = tempG2d.getFontMetrics();
+
+		int width = fm.stringWidth(text);
+		int height = fm.getHeight();
+		tempG2d.dispose();
+
+		// Create exact-size image
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g2d = image.createGraphics();
+
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+		g2d.setFont(font);
+		g2d.setColor(Color.BLACK);
+		g2d.drawString(text, 0, fm.getAscent());
+		g2d.dispose();
+
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(image, "png", baos);
+
+		return "data:image/png;base64," +
+				java.util.Base64.getEncoder().encodeToString(baos.toByteArray());
+	}
+
 }
