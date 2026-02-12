@@ -211,10 +211,35 @@ public class TemplateGenerator extends BaseService {
 												  Map<String, Object> templateValues, String crossImagePath, ResourceBundle firstLanguageProperties)
 			throws RegBaseCheckedException {
 
-		templateValues.put("Fingers", fixBurmeseText(firstLanguageProperties.getString("FingersLabel")));
-		templateValues.put("Iris", fixBurmeseText(firstLanguageProperties.getString("IrisLabel")));
-		templateValues.put("Face", fixBurmeseText(firstLanguageProperties.getString("FaceLabel")));
+		// --- FIX START: Convert static labels to Base64 Images with Error Handling ---
 
+		// 1. Fingers Label
+		String fingersLabel = firstLanguageProperties.getString("FingersLabel");
+		try {
+			fingersLabel = convertTextToBase64Image(fingersLabel);
+		} catch (Exception e) {
+			LOGGER.error("Failed to convert FingersLabel to image", e);
+		}
+		templateValues.put("Fingers", fingersLabel);
+
+		// 2. Iris Label
+		String irisLabel = firstLanguageProperties.getString("IrisLabel");
+		try {
+			irisLabel = convertTextToBase64Image(irisLabel);
+		} catch (Exception e) {
+			LOGGER.error("Failed to convert IrisLabel to image", e);
+		}
+		templateValues.put("Iris", irisLabel);
+
+		// 3. Face Label
+		String faceLabel = firstLanguageProperties.getString("FaceLabel");
+		try {
+			faceLabel = convertTextToBase64Image(faceLabel);
+		} catch (Exception e) {
+			LOGGER.error("Failed to convert FaceLabel to image", e);
+		}
+		templateValues.put("Face", faceLabel);
+		// --- FIX END ---
 		List<BiometricsDto> capturedList = new ArrayList<>();
 		for (String attribute : field.getBioAttributes()) {
 			String key = String.format("%s_%s", field.getId(), attribute);
@@ -341,7 +366,14 @@ public class TemplateGenerator extends BaseService {
 		Map<String, Object> data = null;
 		if(registration.getDocuments().get(field.getId()) != null) {
 			data = new HashMap<>();
-			data.put("label", getFieldLabel(field));
+			String label = getFieldLabel(field);
+			try {
+				label = convertTextToBase64Image(label);
+			} catch (Exception e) {
+				LOGGER.error("Failed to convert document label to image for field: " + field.getId(), e);
+				// On failure, 'label' remains as the original plain text string
+			}
+			data.put("label", label);
 			String langCode = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant().get(0);
 			String category = registration.getDocuments().get(field.getId()).getCategory();
 			data.put("category", fixBurmeseText(category));
@@ -414,6 +446,7 @@ public class TemplateGenerator extends BaseService {
 		}
 		return String.join(RegistrationConstants.SLASH, labels);
 	}
+
 
 	private Map<String, Object> getDemographicData(RegistrationDTO registration, UiFieldDTO field) throws Exception {
 		Map<String, Object> data = null;
