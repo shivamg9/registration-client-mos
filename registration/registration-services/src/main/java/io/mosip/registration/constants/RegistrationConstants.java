@@ -58,6 +58,7 @@ public class RegistrationConstants {
 	public static final String SETTINGS_PAGE = "/fxml/Settings.fxml";
 	public static final String FXML_PATH = "/fxml/";
 	public static final String BIOMETRICS_SCAN_PAGE = "/fxml/BiometricScanPopUp.fxml";
+	public static final String CONSENT_FXML_PATH = "/fxml/Consent.fxml";
 
 	// FXML Id
 	public static final String DEMOGRAPHIC_DETAIL = "demographicDetail";
