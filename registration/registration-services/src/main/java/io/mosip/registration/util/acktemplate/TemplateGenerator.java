@@ -10,6 +10,10 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextAttribute;
+import java.awt.font.TextLayout;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -24,6 +28,7 @@ import java.io.Writer;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.text.AttributedString;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -513,6 +518,7 @@ public class TemplateGenerator extends BaseService {
 			templateValues.put("LOGO2", getImage("/images/LOGO2.png"));
 			templateValues.put("LOGO3", getImage("/images/LOGO3.png"));
 			templateValues.put("GuidelinesImageSource", getImage("/images/burmese_guidelines.png"));
+			templateValues.put("ConsentImageSource", getImage("/images/burmese_consent.png"));
 
 		} catch (RegBaseCheckedException ex) {
 			setErrorResponse(responseDTO, ex.getMessage(), null);
@@ -890,40 +896,77 @@ public class TemplateGenerator extends BaseService {
     }
     return text;
 }
-
-	private String convertTextToBase64Image(String text) throws Exception {
-
-		// Use getResourceAsStream to load from src/main/resources/fonts/
-		InputStream fontStream = this.getClass().getResourceAsStream("/fonts/NotoSansMyanmar-Regular.ttf");
-		Font font = Font.createFont(Font.TRUETYPE_FONT, fontStream).deriveFont(28f);
-
-		// Measure text
-		BufferedImage tempImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D tempG2d = tempImage.createGraphics();
-		tempG2d.setFont(font);
-		FontMetrics fm = tempG2d.getFontMetrics();
-
-		int width = fm.stringWidth(text);
-		int height = fm.getHeight();
-		tempG2d.dispose();
-
-		// Create exact-size image
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g2d = image.createGraphics();
-
-		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
-		g2d.setFont(font);
-		g2d.setColor(Color.BLACK);
-		g2d.drawString(text, 0, fm.getAscent());
-		g2d.dispose();
-
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ImageIO.write(image, "png", baos);
-
-		return "data:image/png;base64," +
-				java.util.Base64.getEncoder().encodeToString(baos.toByteArray());
+private String convertTextToBase64Image(String text) throws Exception {
+	if (text == null || text.isEmpty()) {
+		return RegistrationConstants.EMPTY;
 	}
+
+	// 1. Load the Custom Burmese Font
+	InputStream fontStream = this.getClass().getResourceAsStream("/fonts/NotoSansMyanmar-Regular.ttf");
+	Font burmeseFont = Font.createFont(Font.TRUETYPE_FONT, fontStream).deriveFont(28f);
+
+	// 2. Load a Standard Fallback Font for English/Numbers (SansSerif exists on all JVMs)
+	Font englishFont = new Font("SansSerif", Font.PLAIN, 28);
+
+	// 3. Create an AttributedString to handle mixed fonts
+	AttributedString attributedString = new AttributedString(text);
+
+	// 4. Iterate through the text to apply fonts character by character
+	// If the Burmese font can display the char, use it. Otherwise, use English font.
+	boolean hasBurmese = false;
+	for (int i = 0; i < text.length(); i++) {
+		char c = text.charAt(i);
+		if (burmeseFont.canDisplay(c)) {
+			attributedString.addAttribute(TextAttribute.FONT, burmeseFont, i, i + 1);
+			hasBurmese = true;
+		} else {
+			attributedString.addAttribute(TextAttribute.FONT, englishFont, i, i + 1);
+		}
+	}
+
+	// If the string was empty or logic failed, ensure at least one font is set
+	if (text.length() > 0 && !hasBurmese) {
+		attributedString.addAttribute(TextAttribute.FONT, englishFont);
+	}
+
+	// 5. Use TextLayout to accurately measure mixed-font text
+	// Create a dummy graphics context to get FontRenderContext
+	BufferedImage dummyImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+	Graphics2D dummyG2d = dummyImage.createGraphics();
+	FontRenderContext frc = dummyG2d.getFontRenderContext();
+
+	TextLayout layout = new TextLayout(attributedString.getIterator(), frc);
+
+	// Calculate bounds
+	Rectangle2D bounds = layout.getBounds();
+	// Add padding to ensure no clipping (especially for Burmese ascenders/descenders)
+	int width = (int) Math.ceil(layout.getAdvance()) + 4;
+	int height = (int) Math.ceil(layout.getAscent() + layout.getDescent() + layout.getLeading()) + 4;
+
+	dummyG2d.dispose();
+
+	// 6. Create the actual image
+	BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+	Graphics2D g2d = image.createGraphics();
+
+	// Enable Anti-aliasing for smooth text
+	g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+	g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+	g2d.setColor(Color.BLACK);
+
+	// Draw the mixed-font text
+	// (x=2 for padding, y = ascent + padding)
+	layout.draw(g2d, 2, layout.getAscent() + 2);
+
+	g2d.dispose();
+
+	// 7. Convert to Base64 String
+	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	ImageIO.write(image, "png", baos);
+
+	return "data:image/png;base64," +
+			java.util.Base64.getEncoder().encodeToString(baos.toByteArray());
+}
 
 }
