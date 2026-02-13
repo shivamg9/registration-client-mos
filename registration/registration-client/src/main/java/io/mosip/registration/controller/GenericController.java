@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import io.mosip.registration.util.control.impl.*;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -1103,7 +1104,7 @@ public class GenericController extends BaseController {
 					}
 					break;
 				case CONTROLTYPE_HTML:
-					fxControl = new HtmlFxControl().build(uiFieldDTO);
+					fxControl = new ConsentFxControl().build(uiFieldDTO);
 					break;
 			}
 		}
@@ -2375,6 +2376,7 @@ public class GenericController extends BaseController {
 
 
 }
+
 
 
 
