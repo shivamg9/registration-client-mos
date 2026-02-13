@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<ScrollPane fx:id="scrollPane" fitToWidth="true" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <content>
+        <VBox fx:id="consentVBox" spacing="20" styleClass="consent-container">
+
+            <!-- DROPDOWN COMPONENT (TitledPane) -->
+            <!-- animated: enables sliding animation -->
+            <!-- expanded: false means it starts closed -->
+            <TitledPane fx:id="consentTitledPane" animated="true" expanded="false" collapsible="true" styleClass="consent-titled-pane">
+                <content>
+                    <!-- Content inside the dropdown -->
+                    <VBox fx:id="consentContent" spacing="10" styleClass="consent-content">
+                        <TextFlow fx:id="consentTextFlow" styleClass="consent-text-flow" />
+                    </VBox>
+                </content>
+            </TitledPane>
+
+        </VBox>
+    </content>
+</ScrollPane>
