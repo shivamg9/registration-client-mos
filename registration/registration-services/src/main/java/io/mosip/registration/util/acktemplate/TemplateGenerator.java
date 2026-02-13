@@ -479,15 +479,7 @@ public class TemplateGenerator extends BaseService {
 			templateValues.put(RegistrationConstants.TEMPLATE_UIN, registration.getDemographics().get("UIN"));
 			templateValues.put(RegistrationConstants.TEMPLATE_PRE_REG_ID_LABEL, getLabel("preRegistrationId"));
 			templateValues.put(RegistrationConstants.TEMPLATE_PRE_REG_ID, registration.getPreRegistrationId());
-
-			// --- MODIFIED BLOCK 1 ---
-			templateValues.put(RegistrationConstants.TEMPLATE_MODIFY,
-					fixBurmeseText(firstLanguageProperties.getString("modify")));
-
-			templateValues.put(RegistrationConstants.TEMPLATE_IMPORTANT_GUIDELINES,
-					fixBurmeseText(firstLanguageProperties.getString("importantguidelines")));
-			// ------------------------
-
+			templateValues.put(RegistrationConstants.TEMPLATE_MODIFY, firstLanguageProperties.getString("modify"));
 			templateValues.put(RegistrationConstants.TEMPLATE_MODIFY_IMAGE_SOURCE, getEncodedImage(RegistrationConstants.TEMPLATE_MODIFY_IMAGE_PATH,
 					RegistrationConstants.TEMPLATE_PNG_IMAGE_ENCODING));
 			generateQRCode(registration, templateValues, firstLanguageProperties);
@@ -502,14 +494,7 @@ public class TemplateGenerator extends BaseService {
 			templateValues.put(RegistrationConstants.TEMPLATE_RO_NAME, getValue(registration.getOsiDataDTO().getOperatorID()));
 			templateValues.put(RegistrationConstants.TEMPLATE_REG_CENTER_LABEL, getLabel("registrationcenter"));
 			templateValues.put(RegistrationConstants.TEMPLATE_REG_CENTER, SessionContext.userContext().getRegistrationCenterDetailDTO().getRegistrationCenterName());
-
-			// --- MODIFIED BLOCK 2 ---
-//			String guidelinesText = firstLanguageProperties.getString("importantguidelines");
-//			if ("bur".equals(langCode) && guidelinesText != null) {
-//				guidelinesText = guidelinesText.replaceAll("(\\S+)", "$1\u200C");
-//			}
-//			templateValues.put(RegistrationConstants.TEMPLATE_IMPORTANT_GUIDELINES, guidelinesText);
-			// ------------------------
+			templateValues.put(RegistrationConstants.TEMPLATE_IMPORTANT_GUIDELINES, firstLanguageProperties.getString("importantguidelines"));
 
 			templateValues.put(RegistrationConstants.TEMPLATE_DEMO_INFO, getLabel("demographicInformation"));
 			templateValues.put(RegistrationConstants.TEMPLATE_DOCUMENTS_LABEL, getLabel("documents"));
@@ -527,6 +512,7 @@ public class TemplateGenerator extends BaseService {
 			templateValues.put("LOGO1", getImage("/images/LOGO1.png"));
 			templateValues.put("LOGO2", getImage("/images/LOGO2.png"));
 			templateValues.put("LOGO3", getImage("/images/LOGO3.png"));
+			templateValues.put("GuidelinesImageSource", getImage("/images/burmese_guidelines.png"));
 
 		} catch (RegBaseCheckedException ex) {
 			setErrorResponse(responseDTO, ex.getMessage(), null);
