@@ -330,7 +330,7 @@ public class PacketHandlerController extends BaseController implements Initializ
 			Timestamp ts = userOnboardService.getLastUpdatedTime(SessionContext.userId());
 			if (ts != null) {
 				lastBiometricTime
-						.setText(RegistrationUIConstants.getMessageLanguageSpecific(RegistrationUIConstants.LAST_DOWNLOADED) + " " + getLocalZoneTime(ts.toString()));
+						.setText(RegistrationUIConstants.getMessageLanguageSpecific(RegistrationUIConstants.LAST_DOWNLOADED) + " :\n" + getLocalZoneTime(ts.toString()));
 			}
 
 			loadRegistrationProcesses();
@@ -782,7 +782,7 @@ public class PacketHandlerController extends BaseController implements Initializ
 			Timestamp lastPreRegPacketDownloaded = syncControl.getLastSyncDtimes();
 
 			if (lastPreRegPacketDownloaded != null) {
-				lastPreRegPacketDownloadedTime.setText(RegistrationUIConstants.getMessageLanguageSpecific(RegistrationUIConstants.LAST_DOWNLOADED) + " "
+				lastPreRegPacketDownloadedTime.setText(RegistrationUIConstants.getMessageLanguageSpecific(RegistrationUIConstants.LAST_DOWNLOADED) + " :\n"
 						+ getLocalZoneTime(lastPreRegPacketDownloaded.toString()));
 			}
 		}
@@ -960,5 +960,6 @@ public class PacketHandlerController extends BaseController implements Initializ
             return false;
 	}
 }
+
 
 
