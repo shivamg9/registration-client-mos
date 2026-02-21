@@ -262,11 +262,11 @@ public class BaseController {
 
 	static {
 		try {
-			if (BaseController.class.getResourceAsStream("/fonts/Padauk.ttf") == null) {
-				System.err.println(">>>> FONT LOAD ERROR: Could not find /fonts/Padauk.ttf in resources.");
+			if (BaseController.class.getResourceAsStream("/fonts/NotoSansMyanmar-Regular.ttf") == null) {
+				System.err.println(">>>> FONT LOAD ERROR: Could not find /fonts/NotoSansMyanmar-Regular.ttf in resources.");
 			} else {
 				Font font = Font.loadFont(
-						BaseController.class.getResourceAsStream("/fonts/Padauk.ttf"),
+						BaseController.class.getResourceAsStream("/fonts/NotoSansMyanmar-Regular.ttf"),
 						12
 				);
 				if (font != null) {
@@ -1816,6 +1816,7 @@ public class BaseController {
 		return false;
 	}
 }
+
 
 
 
