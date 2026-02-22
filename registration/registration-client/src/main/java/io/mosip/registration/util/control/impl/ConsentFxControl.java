@@ -159,23 +159,23 @@ public class ConsentFxControl extends FxControl implements Initializable {
                         "• Contact details\n" +
                         "• Documents\n" +
                         "• Biometrics\n\n" +
-                        "I also understand that this information will be stored and processed for the purpose of verifying my identity in order to access various services,\n" +
-                        "or to comply with a legal obligation.\n" +
+                        "I also understand that this information will be stored and processed for the purpose of verifying my identity in order \n" +
+                        "to access various services, or to comply with a legal obligation.\n" +
                         "I give my consent for the collection of this data for this purpose.";
 
             case "bur":
             case "my":
-                return ZWNJ + "မှတ်ပုံတင်စဉ်အတွင်း အဆိုပါအာဏာပိုင်မှ ကျွန်ုပ်အကြောင်း စုဆောင်းထားသော အချက်အလက်များတွင်:\n\n" + ZWNJ+
+                return ZWNJ + "အဆိုပါ အာဏာပိုင်အဖွဲ့အစည်းမှ မှတ်ပုံတင်ခြင်းလုပ်ငန်းစဉ်အတွင်း ကျွန်ုပ်နှင့်ပတ်သက်၍ ကောက်ယူမည့် အချက်အလက်များတွင် အောက်ပါတို့ ပါဝင်ကြောင်း ကျွန်ုပ်နားလည်ပါသည်-\n\n" + ZWNJ+
                         "• အမည်\n"+ ZWNJ +
                         "• မွေးသက္ကရာဇ်\n" + ZWNJ+
                         "• ကျား/မ\n" + ZWNJ+
                         "• လိပ်စာ\n"+ ZWNJ +
-                        "• ဆက်သွယ်ရန်အသေးစိတ်\n"+ ZWNJ +
+                        "• ဆက်သွယ်ရန်လိပ်စာ\n"+ ZWNJ +
                         "• စာရွက်စာတမ်းများ\n"+ ZWNJ +
                         "• ဇီဝအချက်အလက်များ\n\n" + ZWNJ+
-                        "ဤအချက်အလက်များကို ဝန်ဆောင်မှုအမျိုးမျိုးကို ရယူနိုင်ရန် သို့မဟုတ် ဥပဒေအရ တာဝန်ဝတ္တရားများကို လိုက်နာရန်အတွက် \n"+ ZWNJ +
-                        "ကျွန်ုပ်၏မည်သူမည်ဝါဖြစ်ကြောင်း အတည်ပြုရန် ရည်ရွယ်ချက်အတွက် သိမ်းဆည်းပြီး လုပ်ဆောင်သွားမည်ဖြစ်ကြောင်းကိုလည်း ကျွန်ုပ်နားလည်ပါသည်။\n "+ ZWNJ +
-                        "ဤရည်ရွယ်ချက်အတွက် ဤဒေတာစုဆောင်းခြင်းအတွက် ကျွန်ုပ်၏သဘောတူညီခွင့်ပြုချက်ကို ပေးပါသည်။" + ZWNJ;
+                        "ဤအချက်အလက်များကို ဝန်ဆောင်မှုအမျိုးမျိုးရယူရန်အတွက် ကျွန်ုပ်၏ မည်သူမည်ဝါဖြစ်ကြောင်း အတည်ပြုရန် (သို့မဟုတ်) ဥပဒေကြောင်းအရ လိုက်နာဆောင်ရွက်ရန်\n"+ ZWNJ +
+                        "ရည်ရွယ်ချက်ဖြင့် သိမ်းဆည်းပြီး လုပ်ဆောင်သွားမည်ကိုလည်း ကျွန်ုပ်နားလည်ပါသည်။ ဤရည်ရွယ်ချက်အတွက် ဤဒေတာ (အချက်အလက်)\n "+ ZWNJ +
+                        "များ စုဆောင်းခြင်းကို ကျွန်ုပ်သဘောတူညီပါသည်။" + ZWNJ;
             default:
                 return getConsentTextForLanguage("eng");
         }
