@@ -196,7 +196,7 @@
 					<children>
 						<GridPane GridPane.rowIndex="1">
 							<children>
-								<GridPane GridPane.columnIndex="1" GridPane.columnSpan="5">
+								<GridPane GridPane.columnIndex="2" GridPane.columnSpan="6">
 									<children>
 										<Label fx:id="pwdLabel" styleClass="paneHeader" text="%pwdAuthentication" />
 									</children>
