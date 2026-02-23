@@ -124,13 +124,13 @@
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="10.0" prefWidth="100.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Button fx:id="newRegistration" mnemonicParsing="false" onAction="#goToNewRegistration" styleClass="ackPageButton" text="%newregistration" GridPane.columnIndex="3">
+                  <Button fx:id="newRegistration" mnemonicParsing="false" onAction="#goToNewRegistration" styleClass="ackPageButton" text="%newregistration" GridPane.columnIndex="4">
                      <graphic>
                         <ImageView fx:id="newRegistrationBtnImgVw" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
                            <image>
