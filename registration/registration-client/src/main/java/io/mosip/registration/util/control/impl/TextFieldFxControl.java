@@ -112,7 +112,7 @@ public class TextFieldFxControl extends FxControl {
 				TextField textField = (TextField) getField(uiFieldDTO.getId() + langCode);
 
 				String value = textField.getText();
-				if (value != null && ("bur".equals(langCode) || "fullName".equalsIgnoreCase(uiFieldDTO.getId())) && !"email".equalsIgnoreCase((uiFieldDTO.getId()))) {
+				if (value != null && ("bur".equals(langCode) || "fullName".equalsIgnoreCase(uiFieldDTO.getId())) && !"email".equalsIgnoreCase((uiFieldDTO.getId())) && !"phone".equalsIgnoreCase((uiFieldDTO.getId()))) {
 						value = value.replaceAll("(\\S+)", "$1\u200C");
 				}
 				SimpleDto simpleDto = new SimpleDto(langCode, value);
@@ -126,7 +126,7 @@ public class TextFieldFxControl extends FxControl {
 			String langCode = registrationDTO.getSelectedLanguagesByApplicant().get(0);
 			TextField textField = (TextField) getField(uiFieldDTO.getId() + langCode);
 			String value = textField.getText();
-			if (value != null && ("bur".equals(langCode) || "fullName".equalsIgnoreCase(uiFieldDTO.getId())) && !"email".equalsIgnoreCase((uiFieldDTO.getId()))) {
+			if (value != null && ("bur".equals(langCode) || "fullName".equalsIgnoreCase(uiFieldDTO.getId())) && !"email".equalsIgnoreCase((uiFieldDTO.getId())) && !"phone".equalsIgnoreCase((uiFieldDTO.getId()))) {
 				value = value.replaceAll("(\\S+)", "$1\u200C");
 			}
 			registrationDTO.addDemographicField(uiFieldDTO.getId(),value);
@@ -183,7 +183,7 @@ public class TextFieldFxControl extends FxControl {
 			case RegistrationConstants.SIMPLE_TYPE :
 				getRegistrationDTo().getSelectedLanguagesByApplicant().forEach(langCode -> {
 					String labelText = this.uiFieldDTO.getLabel().get(langCode);
-					if (labelText != null && ("bur".equals(langCode) || "fullName".equalsIgnoreCase(uiFieldDTO.getId())) && !"email".equalsIgnoreCase((uiFieldDTO.getId()))) {
+					if (labelText!= null && ("bur".equals(langCode) || "fullName".equalsIgnoreCase(uiFieldDTO.getId())) && !"email".equalsIgnoreCase((uiFieldDTO.getId())) && !"phone".equalsIgnoreCase((uiFieldDTO.getId()))) {
 						labelText = labelText.replaceAll("(\\S+)", "$1\u200C");
 					}
 					labels.add(labelText);
@@ -217,7 +217,7 @@ public class TextFieldFxControl extends FxControl {
 				String langCode = getRegistrationDTo().getSelectedLanguagesByApplicant().get(0);
 				getRegistrationDTo().getSelectedLanguagesByApplicant().forEach(langcode -> {
 					String labelText = this.uiFieldDTO.getLabel().get(langcode);
-					if (labelText != null && ("bur".equals(langCode) || "fullName".equalsIgnoreCase(uiFieldDTO.getId())) && !"email".equalsIgnoreCase((uiFieldDTO.getId()))) {
+					if (labelText != null && ("bur".equals(langCode) || "fullName".equalsIgnoreCase(uiFieldDTO.getId())) && !"email".equalsIgnoreCase((uiFieldDTO.getId())) && !"phone".equalsIgnoreCase((uiFieldDTO.getId()))) {
 						labelText = labelText.replaceAll("(\\S+)", "$1\u200C");
 					}
 					labels.add(labelText);});
