@@ -2353,7 +2353,7 @@ public class GenericController extends BaseController {
 					if (obj instanceof SimpleDto) {
 						SimpleDto simple = (SimpleDto) obj;
 
-						if ((("bur".equals(simple.getLanguage()))||"fullName".equalsIgnoreCase(key) && !"email".equalsIgnoreCase(key)) && simple.getValue() != null && simple.getValue().matches(".*[\\u1000-\\u109F].*")) {
+						if ((("bur".equals(simple.getLanguage()) ||"fullName".equalsIgnoreCase(key)) && !"email".equalsIgnoreCase(key) && !"phone".equalsIgnoreCase(key)) && simple.getValue() != null && simple.getValue().matches(".*[\\u1000-\\u109F].*")) {
 
 							simple.setValue(simple.getValue() + "\u200C");
 						}
@@ -2374,6 +2374,7 @@ public class GenericController extends BaseController {
 
 
 }
+
 
 
 
