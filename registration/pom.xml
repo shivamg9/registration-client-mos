@@ -142,7 +142,7 @@
 		<!-- support jaxb in java11 -->
 		<javax.activation.version>1.2.0</javax.activation.version>
         <jaxb.api.version>2.3.0</jaxb.api.version>
-		<openjfx.version>11.0.2</openjfx.version>
+		<openjfx.version>17.0.10</openjfx.version>
 		
 		<sonar.coverage.exclusions>
 			**/dto/**,
@@ -629,3 +629,4 @@
 		</profile>
 	</profiles>
 </project>
+

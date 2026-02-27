@@ -421,6 +421,7 @@
 	-fx-border-width: 0.0;
 	-fx-text-fill: #666666;
 	-fx-font-size: 14px;
+	-fx-font-family: Padauk;
 }
 
 .selectLanguageFooterText {
@@ -438,12 +439,14 @@
 
 .languageCheckBox {
 	-fx-font-size: 14px;
+	-fx-font-family: Padauk;
 }
 
 .languageCheckBox .box {
 	-fx-background-color: #ffffff;
 	-fx-border-color: #005baa;
 	-fx-border-radius: 5px;
+	-fx-font-family: Padauk;
 }
 
 .languageCheckBox:selected .mark {
@@ -460,21 +463,25 @@
 .loginBorderPaneStyle {
 	-fx-pref-height: 530.0px;
 	-fx-pref-width: 808.0px;
+	-fx-font-family: Noto Sans Myanmar;
 }
 
 .loginLeftPaneStyle {
 	-fx-pref-height: 326.0px;
 	-fx-pref-width: 285.0px;
+	-fx-font-family: Noto Sans Myanmar;
 }
 
 .loginCenterPaneStyle {
 	-fx-pref-height: 500.0px;
 	-fx-pref-width: 500.0px;
+	-fx-font-family: Noto Sans Myanmar;
 }
 
 .loginAnchorPaneStyle {
 	-fx-pref-height: 172.0px;
 	-fx-pref-width: 228.0px;
+	-fx-font-family: Noto Sans Myanmar;
 }
 
 .userNameAnchorPaneStyle {
@@ -483,16 +490,12 @@
 	-fx-background-color: #FFFFFF;
 	-fx-border-width: 1.0 1.0 1.0 1.0;
 	-fx-border-color: #808080;
-}
-
-.loginTextStyle {
-	-fx-pref-height: 39.0px;
-	-fx-pref-width: 221.0px;
-	-fx-prompt-text-fill: derive(-fx-control-inner-background,-30%);
+	-fx-font-family: Noto Sans Myanmar;
 }
 
 .loginTextStyle:focused {
     -fx-prompt-text-fill: derive(-fx-control-inner-background,-30%);
+	-fx-font-family: Padauk;
 }
 
 .hyperLinkStyle {
@@ -500,6 +503,7 @@
 	-fx-underline: false;
 	-fx-border-color: transparent;
 	-fx-font-size: 10.0px;
+	-fx-font-family: Padauk;
 }
 
 .loginSubmitStyle {
@@ -512,6 +516,7 @@
 	-fx-font-size: 10.0px;
 	-fx-effect: dropshadow(three-pass-box, rgba(0.0, 0.0, 0.0, 0.6), 5.0,
 		0.0, 0.0, 1.0);
+	-fx-font-family: Padauk;
 }
 
 .loginSubmitStyle1 {
@@ -524,30 +529,35 @@
 	-fx-font-size: 10.0px;
 	-fx-effect: dropshadow(three-pass-box, rgba(0.0, 0.0, 0.0, 0.6), 5.0,
 		0.0, 0.0, 1.0);
+	-fx-font-family: Padauk;
 }
 
 .loginSubmitStyle:hover {
 	-fx-background-color: #004887;
 	-fx-border-color: #004887;
 	-fx-text-fill: #FFFFFF;
+	-fx-font-family: Padauk;
 }
 
 .loginSubmitStyle:pressed {
 	-fx-background-color: #004887;
 	-fx-border-color: #004887;
 	-fx-text-fill: #FFFFFF;
+	-fx-font-family: Padauk;
 }
 
 .loginSubmitStyle1:hover {
 	-fx-background-color: #004887;
 	-fx-border-color: #004887;
 	-fx-text-fill: #FFFFFF;
+	-fx-font-family: Padauk;
 }
 
 .loginSubmitStyle1:pressed {
 	-fx-background-color: #004887;
 	-fx-border-color: #004887;
 	-fx-text-fill: #FFFFFF;
+	-fx-font-family: Padauk;
 }
 
 .loginOtpValidStyle {
@@ -558,10 +568,11 @@
 .optionsStyle {
 	-fx-pref-height: 244.0px;
 	-fx-pref-width: 944.0px;
+	-fx-font-family: Noto Sans Myanmar;
 }
 
 .optionsButtonStyle {
-	
+	-fx-font-family: Noto Sans Myanmar;
 }
 
 .reRegAnchorPane {
@@ -674,6 +685,7 @@ Working on new Css by taleev
 	-fx-border-color: #005baa;
 	-fx-effect: dropshadow(three-pass-box, rgba(0.0, 0.0, 0.0, 0.3), 5.0,
 		0.0, 0.0, 1.0);
+	-fx-font-family: Padauk;
 }
 
 .preregFetchBtnStyle {
@@ -721,12 +733,14 @@ Working on new Css by taleev
 
 .higlightedLoginLable {
 	-fx-font-size: 30.0px;
+	-fx-font-family: Padauk;
 }
 
 .loginSubmitStyle {
 	-fx-pref-height: 35.0px;
 	-fx-pref-width: 312.0px;
-	-fx-background-color: #005baa
+	-fx-background-color: #005baa;
+	-fx-font-family: Padauk;
 }
 
 .loginOtpValidStyle {
@@ -876,6 +890,7 @@ Working on new Css by taleev
 	-fx-border-radius: 3.0, 3.0, 3.0, 3.0;
 	-fx-font-size: 1.2em;
 	-fx-border-radius: 3.0, 3.0, 3.0, 3.0;
+	-fx-font-family: Noto Sans Myanmar;
 }
 
 .backButton:hover {
@@ -1050,6 +1065,7 @@ Working on new Css by taleev
 	-fx-pref-width: 312.0px;
 	-fx-border-width: 0.0 0.0 2.0 0.0;
 	-fx-border-color: #005baa;
+	-fx-font-family: Noto Sans Myanmar;
 }
 
 .settingsLabel {
@@ -1462,12 +1478,15 @@ Working on new Css by taleev
 	-fx-background-color: #FFFFFF;
 	-fx-border-width: 0.0 0.0 1.0 0.0;
 	-fx-border-color: #005baa;
+	-fx-font-family: Padauk;
 }
 
 .table-view .column-header .label {
 	-fx-alignment: CENTER;
 	-fx-text-fill: #666666;
-	-fx-font: 15.0px Noto Sans Myanmar;
+	-fx-font: 15.0px;
+	-fx-font-family: Padauk;
+    -fx-font-weight: normal;
 }
 
 .table-view>.virtual-flow>.scroll-bar {
@@ -1709,7 +1728,7 @@ Working on new Css by taleev
 	-fx-border-radius: 3.0, 3.0, 3.0, 3.0;
 	-fx-background-color: #005baa;
 	-fx-text-fill: #FFFFFF;
-	-fx-font-family: Noto Sans Myanmar;
+	-fx-font-family: Padauk;
 }
 
 .approveButton:hover {
@@ -1733,7 +1752,7 @@ Working on new Css by taleev
 	-fx-border-radius: 3.0, 3.0, 3.0, 3.0;
 	-fx-background-color: #FFFFFF;
 	-fx-border-color: #005baa;
-	-fx-font-family: Noto Sans Myanmar;
+	-fx-font-family: Padauk;
 }
 
 .rejectButton:hover {
@@ -1765,6 +1784,7 @@ Working on new Css by taleev
 .authenticationStyle {
 	-fx-pref-height: 39.0px;
 	-fx-pref-width: 269.0px;
+	-fx-font-family: Padauk;
 }
 
 .authenticationStyle:focused {
@@ -1860,6 +1880,7 @@ Working on new Css by taleev
 
 .headerDetails {
 	-fx-background-color: #175768;
+	-fx-font-family: Padauk;
 }
 
 .registrationOfficerIdPane {
@@ -1889,7 +1910,7 @@ Working on new Css by taleev
 
 .headerDetails .label {
 	-fx-text-fill: white;
-	-fx-font-family: Noto Sans Myanmar;
+	-fx-font-family: Padauk;
 	-fx-font-size: 14.0px;
 }
 
@@ -2171,7 +2192,6 @@ Working on new Css by taleev
 	-fx-font-size: 11.0px;
 	-fx-text-fill: #666666;
 	-fx-font-family: Noto Sans Myanmar;
-	-fx-font-weight: bold;
 }
 
 .newsUpdateTime {
@@ -2190,11 +2210,10 @@ Working on new Css by taleev
 	-fx-stroke: #C9C9C9;
 }
 
-#newsViewAll {
+.newsViewAll {
 	-fx-font-size: 10.0px;
 	-fx-text-fill: #666666;
 	-fx-font-family: Noto Sans Myanmar;
-	-fx-font-weight: bold;
 }
 /* Home Page Design Ends */
 
@@ -2520,11 +2539,13 @@ Working on new Css by taleev
 }
 
 .schedulerMsg {
-	-fx-font-size: 12.0px;
+	-fx-font-size: 10.0px;
+	-fx-font-family: Noto Sans Myanmar;
 }
 
 .schedulerTimer {
 	-fx-text-fill: red;
+	-fx-font-family: Noto Sans Myanmar;
 }
 
 .schedulerContinueBtn {
@@ -2548,12 +2569,13 @@ Working on new Css by taleev
 	-fx-border-width: 0.0 0.0 1.0 0.0;
 	-fx-border-color: black;
 	-fx-background-color: #175768;
+	-fx-font-family: Noto Sans Myanmar;
 }
 
 .schedulerTitleMsg {
 	-fx-font-size: 14.0px;
 	-fx-text-fill: White;
-	-fx-font-weight: bold;
+	-fx-font-family: Noto Sans Myanmar;
 }
 
 .authenticationErrorMsg {
@@ -2641,11 +2663,13 @@ Working on new Css by taleev
 
 .tab-pane .tab:selected {
     -fx-background-color: white;
+	-fx-font-family: Padauk;
 }
 
 .tab .tab-label {
     -fx-text-fill: #3b3b3b;
     -fx-font-size: 13px;
+	-fx-font-family: Padauk;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-label {
@@ -2655,7 +2679,7 @@ Working on new Css by taleev
 
 .tab:selected .tab-label {
     -fx-text-fill: #0B6A82;
-    -fx-font-weight: bold;
+	-fx-font-family: Padauk;
 }
 
 .tab-pane:top *.tab-header-area {
@@ -2707,3 +2731,72 @@ Working on new Css by taleev
 	-fx-font-size: 18.0px;
 	-fx-text-fill: #005baa;
 }
+.uniform-field-vbox {
+  -fx-pref-width: 280px;
+  -fx-max-width: 280px;
+  -fx-min-width: 280px;
+}
+.uniform-control {
+  -fx-pref-width: 280px;
+  -fx-max-width: 280px;
+  -fx-min-width: 280px;
+}
+.uniform-message-label {
+  -fx-max-width: 280px;
+
+}
+.uniform-field-vbox {
+  -fx-pref-width: 280px;
+  -fx-max-width: 280px;
+  -fx-min-width: 280px;
+}
+.uniform-control {
+  -fx-pref-width: 280px;
+  -fx-max-width: 280px;
+  -fx-min-width: 280px;
+}
+.uniform-message-label {
+  -fx-max-width: 280px;
+}
+.nrcSearchPane {
+  -fx-background-color: #f8f9fa;
+  -fx-border-color: #dee2e6;
+  -fx-border-width: 1;
+  -fx-border-radius: 5;
+  -fx-padding: 10;
+  -fx-margin: 5 0 5 0;
+}
+.nrcFetchBtnStyle {
+    -fx-pref-height: 35.0px;
+    -fx-pref-width: 280.0px;
+    -fx-border-width: 0.0 0.0 1.0 0.0;
+    -fx-border-color: #005baa;
+
+}
+@font-face {
+    font-family: "Padauk";
+    src: url("../fonts/Padauk.ttf");
+}
+.loginBorderPaneStyle {
+    -fx-font-family: "{Padauk}";
+}
+.root {
+    -fx-font-family: "Padauk";
+}
+
+.label,
+.button,
+.text-field,
+.combo-box,
+.password-field {
+    -fx-font-family: "Padauk";
+}
+
+.text-field .prompt-text,
+.password-field .prompt-text {
+    -fx-font-family: "Padauk";
+}
+
+
+
+

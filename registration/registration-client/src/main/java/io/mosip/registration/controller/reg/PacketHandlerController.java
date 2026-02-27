@@ -283,7 +283,17 @@ public class PacketHandlerController extends BaseController implements Initializ
 
 		try {
 			setImagesOnHover();
-
+			// Hide Center Remap Sync
+			centerRemapPane.setVisible(false);
+			centerRemapPane.setManaged(false);
+			// Hide Check Updates
+			checkUpdatesPane.setVisible(false);
+			checkUpdatesPane.setManaged(false);
+			// Hide EOD Approval (Notification for Pre-Registration)
+			reRegistrationPane.setVisible(false);
+			reRegistrationPane.setManaged(false);
+			hideGridPaneRow(eodProcessGridPane, 1);
+			
 			setImage(syncDataImageView, RegistrationConstants.SYNC_IMG);	
 			setImage(downloadPreRegDataImageView, RegistrationConstants.DWLD_PRE_REG_DATA_IMG);
 			setImage(uploadPacketImageView, RegistrationConstants.UPDATE_OPERATOR_BIOMETRICS_IMG);		
@@ -328,6 +338,15 @@ public class PacketHandlerController extends BaseController implements Initializ
 		} catch (RegBaseCheckedException regBaseCheckedException) {
 			LOGGER.error("REGISTRATION - UI- Home Page Loading", APPLICATION_NAME, APPLICATION_ID,
 					regBaseCheckedException.getMessage() + ExceptionUtils.getStackTrace(regBaseCheckedException));
+		}
+	}
+	
+	private void hideGridPaneRow(GridPane grid, int rowIndex) {
+		if (grid.getRowConstraints().size() > rowIndex) {
+			RowConstraints constraints = grid.getRowConstraints().get(rowIndex);
+			constraints.setMinHeight(0);
+			constraints.setPrefHeight(0);
+			constraints.setMaxHeight(0);
 		}
 	}
 
@@ -792,10 +811,13 @@ public class PacketHandlerController extends BaseController implements Initializ
 		try {
 			double version = identitySchemaDao.getLatestEffectiveSchemaVersion();
 			List<ProcessSpec> processSpecs = identitySchemaDao.getAllActiveProcessSpecs(version);
-			addParentRowConstraints(processSpecs == null ? 0 : processSpecs.size());
+			// addParentRowConstraints(processSpecs == null ? 0 : processSpecs.size());
 			AtomicInteger i = new AtomicInteger();
 			Objects.requireNonNull(processSpecs).forEach(processSpec -> {
 				try {
+					if ("LOST".equals(processSpec.getId()) || "BIOMETRIC_CORRECTION".equals(processSpec.getId())) {
+						return; // Skip these processes
+					}
 					FlowType flowType = FlowType.valueOf(processSpec.getFlow());
 					if(flowType == null) {
 						LOGGER.error("Invalid registration flow type {}", processSpec.getFlow());
@@ -890,8 +912,30 @@ public class PacketHandlerController extends BaseController implements Initializ
 					languageSelectionController.init();
 				}
 				else {
-					languageSelectionController.submitLanguagesAndProceed(baseService.getMandatoryLanguages());
-				}
+					List<String> selectedLangs = new ArrayList<>();
+
+                    // If mandatory languages exist → use them
+                    if (!baseService.getMandatoryLanguages().isEmpty()) {
+                        selectedLangs.addAll(baseService.getMandatoryLanguages());
+                    }
+                    // If mandatory empty → fallback to optional languages
+                    else if (!baseService.getOptionalLanguages().isEmpty()) {
+                        String platformLang = ApplicationContext.applicationLanguage();
+
+                        if (baseService.getOptionalLanguages().contains(platformLang)) {
+                            selectedLangs.add(platformLang);
+                        } else {
+                            selectedLangs.add(baseService.getOptionalLanguages().get(0));
+                        }
+                    }
+
+                    // Safety check (never allow empty language list)
+                    if (selectedLangs.isEmpty()) {
+                        throw new PreConditionCheckException(RegistrationConstants.ERROR,"No language configured for registration");
+                    }
+
+                    languageSelectionController.submitLanguagesAndProceed(selectedLangs);
+                }
 			} catch (PreConditionCheckException e) {
 				generateAlert(RegistrationConstants.ERROR, e.getErrorCode());
 			}
@@ -899,6 +943,17 @@ public class PacketHandlerController extends BaseController implements Initializ
 	}
 
 	private boolean isLanguageSelectionRequired() throws PreConditionCheckException {
-		return ( baseService.getMinLanguagesCount() >= 1 && baseService.getMaxLanguagesCount() > 1 );
+			List<String> mandatory = baseService.getMandatoryLanguages();
+            List<String> optional = baseService.getOptionalLanguages();
+
+            // If mandatory languages exist → popup only when > 1 mandatory
+            if (!mandatory.isEmpty()) {
+                return mandatory.size() > 1;
+            }
+
+            // If mandatory empty → auto-pick optional → NO popup
+            return false;
 	}
 }
+
+

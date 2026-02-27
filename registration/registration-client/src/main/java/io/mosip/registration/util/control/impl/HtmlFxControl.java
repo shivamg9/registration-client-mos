@@ -82,7 +82,17 @@ public class HtmlFxControl extends FxControl {
         final Accordion accordion = new Accordion();
         ResourceBundle resourceBundle = ResourceBundle.getBundle(RegistrationConstants.LABELS, Locale.getDefault());
         getRegistrationDTo().getSelectedLanguagesByApplicant().forEach(langCode -> {
-            final TitledPane titledPane = new TitledPane(resourceBundle.getString(langCode), buildWebView(langCode));
+            // if("bur".equals(langCode)&&"consentText".equals(uiFieldDTO.getId())){
+            //     return;
+            // }
+            String titleText = resourceBundle.getString(langCode);
+            Label headerLabel = new Label(titleText);
+            if ("bur".equals(langCode)) {
+                headerLabel.setStyle("-fx-font-family: 'Myanmar Text'; -fx-font-size: 12px;");
+            }
+            final TitledPane titledPane = new TitledPane();
+            titledPane.setGraphic(headerLabel);
+            titledPane.setContent(buildWebView(langCode));   
             accordion.getPanes().add(titledPane);
             changeNodeOrientation(titledPane, langCode);
             titledPane.setId(uiFieldDTO.getId()+langCode);

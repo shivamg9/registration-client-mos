@@ -123,7 +123,6 @@ public class ClientApplication extends Application {
 		try {
 			if(ClientPreLoader.errorsFound)
 				return;
-
 			LOGGER.info("Login screen Initialization {}", new SimpleDateFormat(RegistrationConstants.HH_MM_SS).format(System.currentTimeMillis()));
 
 			setPrimaryStage(primaryStage);

@@ -20,7 +20,7 @@
       <children>
         <Label text="%mosip.io" />
         <Label text="  " />
-        <Label text="%regClientVersion" />
+        <Label fx:id="regClientVersionLabel" text="%regClientVersion" />
         <Label text=" : " />
         <Label fx:id="versionValueLabel" />
       </children>
@@ -31,7 +31,7 @@
       <children>
         <AnchorPane fx:id="userIdPane" layoutX="37.0" layoutY="188.0" styleClass="userNameAnchorPaneStyle" visible="true">
           <children>
-            <Label styleClass="higlightedLoginLable" text="%registrationlogin" AnchorPane.leftAnchor="54.0" AnchorPane.topAnchor="20.0" />
+            <Label fx:id="userIdPaneRegistrationLabel" styleClass="higlightedLoginLable" text="%registrationlogin" AnchorPane.leftAnchor="54.0" AnchorPane.topAnchor="20.0" />
             <TextField fx:id="userId" layoutY="158.0" onAction="#validateUserId" promptText="%withusername" styleClass="loginTextStyle" AnchorPane.leftAnchor="53.0" />
             <ComboBox fx:id="appLanguage" layoutY="101.0" promptText="%chooselanguage" styleClass="loginCombobox" AnchorPane.leftAnchor="53.0" />
             <Button fx:id="sub1" layoutX="53.0" layoutY="211.0" mnemonicParsing="false" onAction="#validateUserId" styleClass="loginSubmitStyle" text="%submit" />
@@ -41,7 +41,7 @@
         </AnchorPane>
         <AnchorPane fx:id="credentialsPane" layoutX="37.0" layoutY="188.0" styleClass="loginAnchorPaneExtendedStyle" visible="false">
           <children>
-            <Label styleClass="higlightedLoginLable" text="%registrationlogin" AnchorPane.leftAnchor="57.0" AnchorPane.topAnchor="41.0" />
+            <Label fx:id="userIdPaneRegistrationLabel2" styleClass="higlightedLoginLable" text="%registrationlogin" AnchorPane.leftAnchor="57.0" AnchorPane.topAnchor="41.0" />
             <PasswordField fx:id="password" layoutY="116.0" onAction="#validateCredentials" promptText="%withpword" styleClass="loginTextStyle" AnchorPane.leftAnchor="53.0" />
             <Button fx:id="sub2" layoutX="52.0" layoutY="171.0" mnemonicParsing="false" onAction="#validateCredentials" styleClass="loginSubmitStyle" text="%submit" />
             <!--                   <Button layoutX="52.0" layoutY="222.0" mnemonicParsing="false" styleClass="loginSubmitStyle" text="%resetPassword" /> -->

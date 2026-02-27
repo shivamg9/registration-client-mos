@@ -69,7 +69,7 @@ public class DOBAgeFxControl extends FxControl {
 
 		HBox dobHBox = new HBox();
 		dobHBox.setId(uiFieldDTO.getId() + RegistrationConstants.HBOX);
-		dobHBox.setSpacing(10);
+		dobHBox.setSpacing(4);
 
 		String mandatorySuffix = getMandatorySuffix(uiFieldDTO);
 
@@ -78,7 +78,7 @@ public class DOBAgeFxControl extends FxControl {
 				.getBundle(langCode, RegistrationConstants.LABELS);
 
 		VBox ageVBox = new VBox();
-		ageVBox.setPrefWidth(390);
+		ageVBox.setPrefWidth(280);
 
 		List<String> labels = new ArrayList<>();
 		getRegistrationDTo().getSelectedLanguagesByApplicant().forEach(lCode -> {
@@ -108,6 +108,7 @@ public class DOBAgeFxControl extends FxControl {
 		Label label = getLabel(uiFieldDTO.getId() + "OR" + RegistrationConstants.LABEL,
 				resourceBundle.getString("ageOrDOBField"), RegistrationConstants.DEMOGRAPHIC_FIELD_LABEL, true, dobHBox.getWidth());
 		label.setMinWidth(Region.USE_PREF_SIZE);
+		label.setPrefWidth(35);
 		label.setAlignment(Pos.CENTER);
 		dobHBox.getChildren().add(label);
 		

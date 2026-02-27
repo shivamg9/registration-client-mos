@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import io.mosip.registration.util.UTF8Control;
 
 import com.neovisionaries.i18n.LanguageAlpha3Code;
 
@@ -136,7 +137,8 @@ public class ApplicationContext {
 							
 							String messageLangCodeKey = String.format("%s_%s", langCode,
 									RegistrationConstants.MESSAGES);
-							ResourceBundle messagesBundle = ResourceBundle.getBundle(RegistrationConstants.MESSAGES, locale);
+							// ResourceBundle messagesBundle = ResourceBundle.getBundle(RegistrationConstants.MESSAGES, locale);
+							ResourceBundle messagesBundle = ResourceBundle.getBundle(RegistrationConstants.MESSAGES, locale, new UTF8Control());
 							if (messagesBundle.getLocale().equals(locale)) {
 								resourceBundleMap.put(messageLangCodeKey, messagesBundle);
 							} else {
@@ -311,5 +313,6 @@ public class ApplicationContext {
 	public ResourceBundle getApplicationLanguageMessagesBundle() {
 		return getBundle(getApplicationLanguage(), RegistrationConstants.MESSAGES);
 	}
+
 
 }

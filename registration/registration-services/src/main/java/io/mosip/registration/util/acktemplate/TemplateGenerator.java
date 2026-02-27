@@ -80,7 +80,11 @@ import io.mosip.registration.service.packet.RegistrationApprovalService;
 import io.mosip.registration.service.sync.MasterSyncService;
 import io.mosip.registration.service.sync.PacketSynchService;
 import io.mosip.registration.update.SoftwareUpdateHandler;
+import org.apache.pdfbox.pdmodel.PDDocument;
 
+import org.apache.pdfbox.rendering.PDFRenderer;
+
+import org.json.JSONArray;
 /**
  * Generates Velocity Template for the creation of acknowledgement
  *
@@ -131,7 +135,7 @@ public class TemplateGenerator extends BaseService {
 		ResponseDTO response = new ResponseDTO();
 
 		try {
-			LOGGER.info(LOG_TEMPLATE_GENERATOR, RegistrationConstants.APPLICATION_NAME,	RegistrationConstants.APPLICATION_ID,
+			LOGGER.info(LOG_TEMPLATE_GENERATOR, RegistrationConstants.APPLICATION_NAME,    RegistrationConstants.APPLICATION_ID,
 					"generateTemplate had been called for preparing Acknowledgement Template.");
 
 			Map<String, Object> templateValues = new WeakHashMap<>();
@@ -196,11 +200,11 @@ public class TemplateGenerator extends BaseService {
 	private Map<String, Object> getBiometericData(RegistrationDTO registration, UiFieldDTO field, boolean isPrevTemplate,
 												  Map<String, Object> templateValues, String crossImagePath, ResourceBundle firstLanguageProperties)
 			throws RegBaseCheckedException {
-		
+
 		templateValues.put("Fingers", firstLanguageProperties.getString("FingersLabel"));
 		templateValues.put("Iris", firstLanguageProperties.getString("IrisLabel"));
 		templateValues.put("Face", firstLanguageProperties.getString("FaceLabel"));
-		
+
 		List<BiometricsDto> capturedList = new ArrayList<>();
 		for (String attribute : field.getBioAttributes()) {
 			String key = String.format("%s_%s", field.getId(), attribute);
@@ -298,7 +302,7 @@ public class TemplateGenerator extends BaseService {
 		return bio_data;
 	}
 
-	private void setFingerRankings(List<BiometricsDto> capturedFingers,	List<String> fingers, Map<String, Object> data) {
+	private void setFingerRankings(List<BiometricsDto> capturedFingers,    List<String> fingers, Map<String, Object> data) {
 		Map<String, Double> sortedvalues = capturedFingers.stream()
 				.filter(b -> fingers.contains(b.getBioAttribute()) && b.getAttributeISO() != null)
 				.sorted(Comparator.comparing(BiometricsDto::getQualityScore))
@@ -332,15 +336,61 @@ public class TemplateGenerator extends BaseService {
 			data.put("value", registration.getDocuments().get(field.getId()).getValue());
 			data.put("format", registration.getDocuments().get(field.getId()).getFormat());
 			data.put("refNumber", registration.getDocuments().get(field.getId()).getRefNumber());
+			try {
+				data.put("document", convertDocumentToPngBase64List(
+						registration.getDocuments().get(field.getId()).getDocument()
+				));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
-			/*if("POE".equalsIgnoreCase(field.getSubType()) && !registration.getDocuments().get(field.getId()).getType().equalsIgnoreCase("COE")) {
-				templateValues.put(RegistrationConstants.TEMPLATE_EXCEPTION_IMAGE_SOURCE, RegistrationConstants.TEMPLATE_JPG_IMAGE_ENCODING +
-						StringUtils.newStringUtf8(Base64.encodeBase64(registration.getDocuments().get(field.getId()).getDocument(), false)));
-			}*/
+          /*if("POE".equalsIgnoreCase(field.getSubType()) && !registration.getDocuments().get(field.getId()).getType().equalsIgnoreCase("COE")) {
+             templateValues.put(RegistrationConstants.TEMPLATE_EXCEPTION_IMAGE_SOURCE, RegistrationConstants.TEMPLATE_JPG_IMAGE_ENCODING +
+                   StringUtils.newStringUtf8(Base64.encodeBase64(registration.getDocuments().get(field.getId()).getDocument(), false)));
+          }*/
 		}
 		return data;
 	}
+	private static String convertDocumentToPngBase64List(byte[] documentBytes) throws IOException {
+		List<String> pngBase64List = new ArrayList<>();
 
+		// Check if PDF
+		if (isPdf(documentBytes)) {
+			try (PDDocument document = PDDocument.load(new ByteArrayInputStream(documentBytes))) {
+				PDFRenderer pdfRenderer = new PDFRenderer(document);
+
+				for (int page = 0; page < document.getNumberOfPages(); page++) {
+					BufferedImage image = pdfRenderer.renderImageWithDPI(page, 300);
+					pngBase64List.add(convertImageToBase64Png(image));
+				}
+			}
+		}
+		// Otherwise treat as image (png / jpg / jpeg)
+		else {
+			BufferedImage image = ImageIO.read(new ByteArrayInputStream(documentBytes));
+			if (image == null) {
+				throw new IOException("Unsupported image format");
+			}
+			pngBase64List.add(convertImageToBase64Png(image));
+		}
+
+		return new JSONArray(pngBase64List).toString();
+	}
+	private static boolean isPdf(byte[] bytes) {
+		return bytes.length >= 4 &&
+				bytes[0] == '%' &&
+				bytes[1] == 'P' &&
+				bytes[2] == 'D' &&
+				bytes[3] == 'F';
+	}
+	private static String convertImageToBase64Png(BufferedImage image) throws IOException {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		ImageIO.write(image, "png", outputStream);
+		byte[] pngBytes = outputStream.toByteArray();
+		return "data:image/png;base64," +
+				StringUtils.newStringUtf8(Base64.encodeBase64(pngBytes));
+	}
 	private String getFieldLabel(UiFieldDTO field) {
 		List<String> labels = new ArrayList<>();
 		List<String> selectedLanguages = getRegistrationDTOFromSession().getSelectedLanguagesByApplicant();
@@ -550,7 +600,7 @@ public class TemplateGenerator extends BaseService {
 				|| fieldValue instanceof Double) {
 			value = String.valueOf(fieldValue);
 		}
-		
+
 		if (value != null && !getRegistrationDTOFromSession().BLOCKLISTED_CHECK.isEmpty()) {
 			List<BlocklistedConsentDto> blockListedWords = getRegistrationDTOFromSession().BLOCKLISTED_CHECK.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
 			List<String> words = new ArrayList<>();
@@ -559,7 +609,7 @@ public class TemplateGenerator extends BaseService {
 				value = value.replaceAll(word, "<mark>"+word+"</mark>");
 			}
 		}
-		
+
 		return value == null ? RegistrationConstants.EMPTY : value;
 	}
 
@@ -618,7 +668,7 @@ public class TemplateGenerator extends BaseService {
 			LOGGER.info(LOG_TEMPLATE_GENERATOR, RegistrationConstants.APPLICATION_NAME,
 					RegistrationConstants.APPLICATION_ID,
 					"generateTemplate had been called for preparing Dashboard Template.");
-			
+
 			Map<String, Object> templateValues = new WeakHashMap<>();
 			ApplicationContext.getInstance();
 			ResourceBundle applicationLanguageProperties = ApplicationContext.getBundle(ApplicationContext.applicationLanguage(), RegistrationConstants.LABELS);

@@ -336,6 +336,7 @@ public class LoginController extends BaseController implements Initializable {
 		loginRoot = BaseController.load(getClass().getResource(RegistrationConstants.INITIAL_PAGE));
 		scene = getScene(loginRoot);
 		pageFlow.loadPageFlow();
+		// setTextsBasedOnLanguage();
 
 		if (userName != null) {
 			userId.setText(userName);
@@ -1025,4 +1026,62 @@ public class LoginController extends BaseController implements Initializable {
 		}
 
 	}
+
+	@FXML
+	private Label userIdPaneRegistrationLabel;
+
+	@FXML
+	private Label userIdPaneRegistrationLabel2;
+
+	@FXML
+	private Label regClientVersionLabel;
+
+	@FXML
+	private Button sub1;
+
+	@FXML
+	private Button sub2;
+
+	@FXML
+	private Hyperlink back;
+
+	public void setTextsBasedOnLanguage() {
+		String currentLang = ApplicationContext.applicationLanguage();
+		if (!"bur".equalsIgnoreCase(currentLang)) {
+			return; // Only proceed for Burmese language
+		}
+
+		// Set text for components that exist on all screens
+		if (regClientVersionLabel != null) {
+			regClientVersionLabel.setText("မှတ်ပုံတင်ခြင်း-ဖောက်သည် ဗားရှင်း");
+		}
+
+		// Set text for username screen components
+		setUserNameScreenTexts();
+
+		// Set text for other screen components (with null checks)
+		if (userIdPaneRegistrationLabel != null) {
+			userIdPaneRegistrationLabel.setText("လော့ဂ်အင်");
+		}
+		if (userIdPaneRegistrationLabel2 != null) {
+			userIdPaneRegistrationLabel2.setText("လော့ဂ်အင်");
+		}
+		if (sub1 != null) {
+			sub1.setText("ဆက်လက်လုပ်ဆောင်ရန်");
+		}
+		if (sub2 != null) {
+			sub2.setText("ဆက်လက်လုပ်ဆောင်ရန်");
+		}
+		if (back != null) {
+			back.setText("နောက်သို့");
+		}
+	}
+
+	private void setUserNameScreenTexts() {
+		// Set texts specific to username screen components
+		// Add your FXML components from the username screen here
+	}
 }
+
+
+

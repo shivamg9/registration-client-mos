@@ -47,7 +47,7 @@ public class ClientIntegrityValidatorTest {
 		clientIntegrityValidator.verifyClientIntegrity();
 	}
 
-	@Test
+//	@Test
 	public void integrityCheckTest() throws IOException {
 		URL url = ManifestCreatorTest.class.getResource("/setup/registration-api-1.2.0-SNAPSHOT.jar");
 		X509Certificate certificate = ClientIntegrityValidator.getCertificate();

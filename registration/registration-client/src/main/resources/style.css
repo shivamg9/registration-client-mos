@@ -1,0 +1,18 @@
+/* 1. IMPORT BURMESE FONT FROM PROJECT RESOURCES */
+@font-face {
+    font-family: 'Noto Sans Myanmar';
+    src: url('fonts/NotoSansMyanmar-Regular.ttf');
+}
+
+/* 2. APPLY THE BURMESE FONT TO THE WHOLE APPLICATION */
+.root {
+    -fx-font-family: 'Noto Sans Myanmar';
+}
+
+/* Or, apply it only to the specific label if you prefer */
+.newsUpdatesTitle {
+    -fx-font-family: 'Noto Sans Myanmar';
+    /* You can keep other styles for this class here */
+    -fx-font-size: 14px;
+    -fx-text-fill: #333;
+}

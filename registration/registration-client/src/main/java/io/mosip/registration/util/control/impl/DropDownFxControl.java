@@ -57,6 +57,34 @@ public class DropDownFxControl extends FxControl {
 		this.control = this;
 		this.node = create(uiFieldDTO, getRegistrationDTo().getSelectedLanguagesByApplicant().get(0));
 
+		// Check if custom locationHierarchy is specified
+		List<String> locationHierarchy = uiFieldDTO.getLocationHierarchy();
+		if(locationHierarchy != null && !locationHierarchy.isEmpty() && locationHierarchy.size() >= 1) {
+			try {
+				this.hierarchyLevel = Integer.parseInt(locationHierarchy.get(0));
+				TreeMap<Integer, String> groupFields = GenericController.currentHierarchyMap.getOrDefault(uiFieldDTO.getGroup(), new TreeMap<>());
+				groupFields.put(this.hierarchyLevel, uiFieldDTO.getId());
+				GenericController.currentHierarchyMap.put(uiFieldDTO.getGroup(), groupFields);
+			} catch (NumberFormatException e) {
+				LOGGER.error("Invalid hierarchy level in locationHierarchy: " + locationHierarchy.get(0));
+				// Fallback to default logic
+				setDefaultHierarchyLevel(uiFieldDTO);
+			}
+		} else {
+			// Default logic
+			setDefaultHierarchyLevel(uiFieldDTO);
+		}
+
+		Map<String, Object> data = new LinkedHashMap<>();
+		data.put(getRegistrationDTo().getSelectedLanguagesByApplicant().get(0),
+				getPossibleValues(getRegistrationDTo().getSelectedLanguagesByApplicant().get(0)));
+
+		//clears & refills items
+		fillData(data);
+		return this.control;
+	}
+
+	private void setDefaultHierarchyLevel(UiFieldDTO uiFieldDTO) {
 		//As subType in UI Spec is defined in any lang we find the langCode to fill initial dropdown
 		String subTypeLangCode = getSubTypeLangCode(uiFieldDTO.getSubType());
 		if(subTypeLangCode != null) {
@@ -70,14 +98,6 @@ public class DropDownFxControl extends FxControl {
 				}
 			}
 		}
-
-		Map<String, Object> data = new LinkedHashMap<>();
-		data.put(getRegistrationDTo().getSelectedLanguagesByApplicant().get(0),
-				getPossibleValues(getRegistrationDTo().getSelectedLanguagesByApplicant().get(0)));
-
-		//clears & refills items
-		fillData(data);
-		return this.control;
 	}
 
 	private String getSubTypeLangCode(String subType) {
@@ -142,8 +162,60 @@ public class DropDownFxControl extends FxControl {
 	public List<GenericDto> getPossibleValues(String langCode) {
 		boolean isHierarchical = false;
 		String fieldSubType = uiFieldDTO.getSubType();
+		List<GenericDto> result = masterSyncService.getFieldValues(fieldSubType, langCode, isHierarchical);
 
-		if(GenericController.currentHierarchyMap.containsKey(uiFieldDTO.getGroup())) {
+		// ADD THIS DEBUG LOGGING
+		LOGGER.debug("getPossibleValues for field '{}', langCode '{}', returned {} items",
+				uiFieldDTO.getId(), langCode, result.size());
+		if (!result.isEmpty()) {
+			LOGGER.debug("First item: code='{}', name='{}'", result.get(0).getCode(), result.get(0).getName());
+		}
+
+		// Check if custom locationHierarchy is specified
+		List<String> locationHierarchy = uiFieldDTO.getLocationHierarchy();
+		if(locationHierarchy != null && !locationHierarchy.isEmpty()) {
+			isHierarchical = true;
+			if(locationHierarchy.size() >= 1) {
+				// locationHierarchy[0] is level, locationHierarchy[1] is parent code (if present)
+				try {
+					int customLevel = Integer.parseInt(locationHierarchy.get(0));
+
+					// Check if this is the first in hierarchy or has a parent selected
+					if(GenericController.currentHierarchyMap.containsKey(uiFieldDTO.getGroup())) {
+						Entry<Integer, String> parentEntry = GenericController.currentHierarchyMap.get(uiFieldDTO.getGroup())
+								.lowerEntry(this.hierarchyLevel);
+						if(parentEntry != null) {
+							// Has parent field, get selected value
+							FxControl fxControl = GenericController.getFxControlMap().get(parentEntry.getValue());
+							Node comboBox = getField(fxControl.getNode(), parentEntry.getValue());
+							GenericDto selectedItem = comboBox != null ?
+									((ComboBox<GenericDto>) comboBox).getSelectionModel().getSelectedItem() : null;
+							fieldSubType = selectedItem != null ? selectedItem.getCode() : null;
+							if(fieldSubType == null)
+								return Collections.EMPTY_LIST;
+						} else if(locationHierarchy.size() >= 2) {
+							// First in hierarchy, use the specified parent code
+							fieldSubType = locationHierarchy.get(1);
+						} else {
+							// No parent specified, use default logic
+							Entry<Integer, String> defaultParentEntry = GenericController.hierarchyLevels.get(langCode).lowerEntry(this.hierarchyLevel);
+							Assert.notNull(defaultParentEntry);
+							List<Location> locations = masterSyncDao.getLocationDetails(defaultParentEntry.getValue(), langCode);
+							fieldSubType = locations != null && !locations.isEmpty() ? locations.get(0).getCode() : null;
+						}
+					} else if(locationHierarchy.size() >= 2) {
+						// Not in hierarchy map, use specified parent
+						fieldSubType = locationHierarchy.get(1);
+					} else {
+						// No parent specified, use default
+						fieldSubType = uiFieldDTO.getSubType();
+					}
+				} catch (NumberFormatException e) {
+					LOGGER.error("Invalid hierarchy level in locationHierarchy: " + locationHierarchy.get(0));
+					fieldSubType = null;
+				}
+			}
+		} else if(GenericController.currentHierarchyMap.containsKey(uiFieldDTO.getGroup())) {
 			isHierarchical = true;
 			Entry<Integer, String> parentEntry = GenericController.currentHierarchyMap.get(uiFieldDTO.getGroup())
 					.lowerEntry(this.hierarchyLevel);
@@ -175,6 +247,9 @@ public class DropDownFxControl extends FxControl {
 
 		//field.setPromptText(titleText);
 		field.setDisable(isDisable);
+		field.setPrefWidth(280);
+		field.setMaxWidth(280);
+		field.setMinWidth(280);
 		field.getStyleClass().add(RegistrationConstants.DEMOGRAPHIC_COMBOBOX);
 		field.setConverter((StringConverter<GenericDto>) uiRenderForComboBox);
 		return field;
@@ -227,8 +302,8 @@ public class DropDownFxControl extends FxControl {
 			appComboBox.getStyleClass().removeIf((s) -> {
 				return s.equals("demographicComboboxFocused");
 			});
-			if(!isValid) { 
-				appComboBox.getStyleClass().add("demographicComboboxFocused"); 
+			if(!isValid) {
+				appComboBox.getStyleClass().add("demographicComboboxFocused");
 			}
 		}
 		return isValid;

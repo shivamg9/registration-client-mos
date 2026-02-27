@@ -185,6 +185,7 @@ public class PacketHandlerServiceImpl extends BaseService implements PacketHandl
 			responseDTO.getErrorResponseDTOs().add(errorResponseDTO);
 			return responseDTO;
 		}
+		registrationDTO.addDemographicField("selectedHandles", "UID");
 
 		if (registrationDTO.getAdditionalInfoReqId() != null) {
 			registrationDTO.setAppId(registrationDTO.getAdditionalInfoReqId().split("-")[0]);
