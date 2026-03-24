@@ -27,6 +27,7 @@ import io.mosip.registration.controller.FXUtils;
 import io.mosip.registration.controller.GenericController;
 import io.mosip.registration.dto.schema.ProcessSpecDto;
 import io.mosip.registration.dto.schema.UiFieldDTO;
+import io.mosip.registration.util.common.UidValidator;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -95,6 +96,9 @@ public class UpdateUINController extends BaseController implements Initializable
 	private Map<String, Map<String, String>> groupLabels;
 
 	private FXUtils fxUtils;
+
+	@Autowired
+	private UidValidator uidValidator;
 
 	/*
 	 * (non-Javadoc)
@@ -226,8 +230,8 @@ public class UpdateUINController extends BaseController implements Initializable
 				return;
 			}
 
-			if (uinValidatorImpl.validateId(uinId.getText()) && !selectedFieldGroups.isEmpty()) {
-				getRegistrationDTOFromSession().addDemographicField("UIN", uinId.getText());
+			if (uidValidator.validate(uinId.getText()) && !selectedFieldGroups.isEmpty()) {
+				getRegistrationDTOFromSession().addDemographicField("UID", uinId.getText());
 				getRegistrationDTOFromSession().setUpdatableFieldGroups(selectedFieldGroups);
 				getRegistrationDTOFromSession().setUpdatableFields(new ArrayList<>());
 				getRegistrationDTOFromSession().setBiometricMarkedForUpdate(selectedFieldGroups.contains(RegistrationConstants.BIOMETRICS_GROUP) ? true : false);
