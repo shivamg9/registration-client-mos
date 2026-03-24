@@ -395,7 +395,7 @@ public class PacketHandlerServiceImpl extends BaseService implements PacketHandl
 			switch (registrationDTO.getFlowType()) {
 				case UPDATE:
 					if (demographics.get(fieldName) != null && (registrationDTO.getUpdatableFields().contains(fieldName) ||
-							fieldName.equals("UIN")))
+							fieldName.equals("UID")))
 						setField(registrationDTO.getRegistrationId(), fieldName, demographics.get(fieldName),
 								registrationDTO.getProcessId().toUpperCase(), source);
 					break;
